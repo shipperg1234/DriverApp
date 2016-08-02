@@ -1,0 +1,177 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context="in.co.theshipper.www.shipper_driver.NewBooking">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <Button
+            android:id="@+id/customer_mobile_no"
+            style="@style/normal_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentTop="true"
+            android:drawableLeft="@drawable/ic_support"
+            android:text="mobno" />
+    </LinearLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="8">
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFF"
+        android:fillViewport="true"
+        >
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <ImageView
+                android:id="@+id/material_image"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerHorizontal="true" />
+
+
+            <TextView
+                android:id="@+id/crn_no"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/material_image"
+                android:gravity="center_horizontal"
+                android:text="crn number"
+                android:textSize="@dimen/medium_text_size" />
+
+            <TextView
+                android:id="@+id/booking_datetime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentStart="true"
+                android:layout_below="@+id/crn_no"
+                android:gravity="center_horizontal"
+                android:text="date"
+                android:textSize="@dimen/semi_medium_text_size" />
+
+            <TextView
+
+                android:id="@+id/vehicle_type"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="44dp"
+                android:text="veh"
+                android:layout_below="@+id/dropoff_point"
+                android:layout_alignLeft="@+id/dropoff_point"
+                android:layout_alignStart="@+id/dropoff_point" />
+
+
+            <TextView
+
+                android:id="@+id/material_weight"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignLeft="@+id/vehicle_type"
+                android:layout_alignStart="@+id/vehicle_type"
+                android:layout_below="@+id/vehicle_type"
+                android:layout_marginTop="30dp"
+                android:text="weight" />
+
+            <TextView
+
+                android:id="@+id/pickup_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="pickup"
+                android:textSize="10sp"
+                android:layout_marginTop="43dp"
+                android:layout_below="@+id/booking_datetime"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginLeft="30dp" />
+
+            <TextView
+
+                android:id="@+id/dropoff_point"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="dropoff"
+                android:textSize="10sp"
+                android:layout_marginTop="32dp"
+                android:layout_below="@+id/pickup_point"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentRight="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginLeft="30dp" />
+
+
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/loc"
+                android:layout_above="@+id/vehicle_type"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignTop="@+id/pickup_point"
+                android:layout_toLeftOf="@+id/vehicle_type"
+                android:layout_toStartOf="@+id/vehicle_type" />
+        </RelativeLayout>
+    </ScrollView>
+</LinearLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_below="@id/material_weight"
+        android:orientation="horizontal"
+        android:weightSum="2">
+
+        <Button
+            android:id="@+id/Accept"
+            style="@style/normal_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="ACCEPT" />
+
+        <Button
+            android:id="@+id/Reject"
+            style="@style/normal_button"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="REJECT" />
+    </LinearLayout>
+</LinearLayout>
+</LinearLayout>
+
+

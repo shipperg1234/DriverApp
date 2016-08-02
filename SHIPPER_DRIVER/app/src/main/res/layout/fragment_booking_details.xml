@@ -1,0 +1,58 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".BookingDetails"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <LinearLayout
+      style="@style/vertical_LL">
+        <!-- TODO: Update blank fragment layout -->
+        <LinearLayout
+            style="@style/horizontal_LL.sm.1">
+            <TextView
+                style="@style/highlighted_textview"
+                android:id="@+id/location_datetime">
+            </TextView>
+        </LinearLayout>
+        <LinearLayout
+            style="@style/horizontal_LL.sm.1"
+            android:id="@+id/start_view">
+            <Button
+                style="@style/full_screen_button"
+                android:text="@string/button_start_journey"
+                android:id="@+id/start" />
+        </LinearLayout>
+        <LinearLayout
+            style="@style/horizontal_LL.sm.8"
+            android:id="@+id/map">
+        </LinearLayout>
+        <!-- TODO: Update blank fragment layout -->
+
+        <LinearLayout
+            style="@style/horizontal_LL.sm.2">
+            <LinearLayout
+                style="@style/vertical_LL.sm.1">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/material_image" />
+            </LinearLayout>
+            <LinearLayout
+                style="@style/vertical_LL.sm.3">
+                <LinearLayout
+                    style="@style/horizontal_LL.sm.1">
+                    <Button
+                        style="@style/full_screen_button"
+                        android:id="@+id/customer_mobile_no"
+                        android:drawableLeft="@drawable/ic_support" />
+                </LinearLayout>
+                <LinearLayout
+                    style="@style/horizontal_LL.sm.1">
+                    <TextView
+                        style="@style/highlighted_textview"
+                        android:id="@+id/customer_name">
+                    </TextView>
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</FrameLayout>

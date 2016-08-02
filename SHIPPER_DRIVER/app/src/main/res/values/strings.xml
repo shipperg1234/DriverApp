@@ -1,0 +1,116 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--RANDOM TEXT-->
+    <string name="app_name">DRIVER</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="LOCAL_ROOT_PATH">http://192.168.0.102/loader_mobile/</string>
+    <string name="SERVER_ROOT_PATH">www.theshipper.co.in/</string>
+    <string name="ACTION_PATH">action/</string>
+    <string name="INCLUDE_PATH">includes/</string>
+
+    <!--Messaqges-->
+    <string name="GPSAlertDialogTitle">GPS LOCATION SETTING</string>
+    <string name="GPSAlertDialogMessage">Your GPS location is not enabled</string>
+    <string name="NetworkAlertDialogTitle">NETWORK SETTING</string>
+    <string name="NetworkAlertDialogMessage">Your Internet is not enabled</string>
+    <string name="LogoutAlertDialogTitle">LOGOUT</string>
+    <string name="LogoutAlertDialogMessage">Do you want to logout ?</string>
+    <string name="cancel">Cancel</string>
+    <string name="Yes">Yes</string>
+    <string name="No">No</string>
+
+    <!--Edit text Placeholder hint-->
+    <string name="hint_mobile_no">10 Digit Mobile No</string>
+    <string name="hint_name">Your Name</string>
+    <string name="hint_email">Your Email</string>
+    <string name="hint_postal_address">Your Address</string>
+    <string name="hint_otp">6 Digit OTP</string>
+    <string name="hint_pickup_point">Pickup Point</string>
+    <string name="hint_dropoff_point">Drop Off Point</string>
+
+    <!--Button Text-->
+    <string name="button_text_registration">REGISTER</string>
+    <string name="button_text_OtpVerification">VERIFY OTP</string>
+    <string name="button_text_update">UPDATE</string>
+    <string name="button_start_journey">START JOURNEY</string>
+    <string name="button_end_journey">END JOURNEY</string>
+    <string name="button_generate_bill">GENERATE BILL</string>
+
+    <string name="button_text_cancel">CANCEL</string>
+    <string name="button_text_ok">OK</string>
+
+    <!--Google Services-->
+    <string name="gcm_senderID">290729759682</string>
+    <string name="google_app_id">290729759682</string>
+    <string name="app_APIkey">AIzaSyD9NxvrznPn9WyeWJ1zVEZTfwkz-PYSokg</string>
+    <string name="server_APIkey1">AIzaSyCF9AFjZ4WcXAH6Qgpxm3VjgjoeuyGAADE</string>
+
+    <!--NAVIGATION DRAWER-->
+    <string-array name="nav_menu">
+        <item>Rate Card</item>
+        <item>Bookings</item>
+        <item>Calculator</item>
+        <item>Emergency Contact</item>
+        <item>Support</item>
+        <item>About</item>
+        <item>Logout</item>
+    </string-array>
+    <!--NAVIGATION DRAWER-->
+    <string-array name="title_menu">
+        <item>Rate Card</item>
+        <item>Bookings</item>
+        <item>Calculator</item>
+        <item>Emergency Contact</item>
+        <item>Support</item>
+        <item>About</item>
+        <item>Logout</item>
+        <item>Logout</item>
+        <item>Logout</item>
+        <item>Logout</item>
+        <item>Bill Details</item>
+        <item>New Booking</item>
+    </string-array>
+
+    <!--SLIDE TAB MENU-->
+    <string-array name="slide_tab_manu">
+        <item>Current Booking</item>
+        <item>Future Boooking</item>
+        <item>Finished Booking</item>
+    </string-array>
+
+    <!--TITLE OF ACTIVITIES-->
+    <string name="title_activity_otp_verification">OTP Verification</string>
+    <string name="title_activity_edit_profile">Edit Profile</string>
+    <string name="title_activity_current_location">Map</string>
+    <string name="title_activity_gps_tracking">GpsTracking</string>
+    <string name="title_activity_sqllite_start">SQLliteStart</string>
+    <string name="title_activity_otp__verification__done">OTP VERIFICATION DONE</string>
+    <string name="title_registration_page">REGISTRATION</string>
+    <string name="title_activity_full">Bookings</string>
+    <string name="drawer_open">Open Nav Drawer</string>
+    <string name="drawer_close">Close Nav Drawer</string>
+    <string name="title_activity_get_direction">Map</string>
+    <string name="title_activity_maps">Map</string>
+
+    <!--TITLE OF FRAGMENT-->
+    <string name="title_emergency_contact_fragment">Emergency Contact</string>
+    <string name="title_about_fragment">About</string>
+    <string name="title_bookings_fragment">Bookings</string>
+    <string name="title_current_booking_fragment">Current Booking</string>
+    <string name="title_future_booking_fragment">Future Booking</string>
+    <string name="title_finished_booking_fragment">Future Booking</string>
+    <string name="title_booking_status_fragment">Booking Status</string>
+    <string name="title_rate_card_fragment">Rate Card</string>
+    <string name="title_bill_detail_fragment">Bill Details</string>
+    <string name="title_current_booking_detail_fragment">Current Bookings Detail</string>
+    <string name="title_future_booking_detail_fragment">Future Bookings Detail</string>
+    <string name="title_finished_booking_detail_fragment">Finished Bookings Detail</string>
+
+    <!--MENU VALUES-->
+    <string name="delete">DELETE</string>
+
+    <!--SYMBOLS-->
+    <string name="semi_colon">: </string>
+</resources>

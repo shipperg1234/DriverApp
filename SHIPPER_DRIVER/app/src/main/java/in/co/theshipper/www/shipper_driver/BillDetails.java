@@ -60,10 +60,6 @@ public class BillDetails extends Fragment{
         super.onActivityCreated(savedInstanceState);
             if((getActivity().getIntent()!= null)&&(getActivity().getIntent().getExtras()!= null)) {
                 Bundle bundle = getActivity().getIntent().getExtras();
-//                Fn.logD("seconds",Fn.getValueFromBundle(bundle,"seconds"));
-//                Fn.logD("minutes",Fn.getValueFromBundle(bundle,"minutes"));
-//                Fn.logD("hours", Fn.getValueFromBundle(bundle, "hours"));
-//                Fn.logD("distance",Fn.getValueFromBundle(bundle,"distance"));
                 diffsec = (long) bundle.getLong("seconds",0);
                 diffmin = (long) bundle.getLong("minutes",0);
                 diffHours =(long) bundle.getLong("hours", 0);
@@ -180,27 +176,9 @@ public class BillDetails extends Fragment{
             @Override
             public void onResponse(String response) {
                 if(method.equals("bill_generated")) {
-                    if (!Fn.CheckJsonError(response)) {
-                        Fn.logD("onResponse", String.valueOf(response));
-                        Fn.logD("haha my response is","true");
-                        Fragment fragment = new Fragment();
-                        fragment = new FinishedBookingDetail();
-                        Bundle bundle = new Bundle();
-                        bundle.putString("crn_no", crn_no);
-                        fragment.setArguments(Fn.CheckBundle(bundle));
-                        FragmentManager fragmentManager = FullActivity.fragmentManager;
-                        FragmentTransaction transaction = fragmentManager.beginTransaction();
-//                Fragment fragment = new BookNow();
-                        transaction.replace(R.id.main_content, fragment, Constants.Config.CURRENT_FRAG_TAG);
-                        if((FullActivity.homeFragmentIndentifier == -5)){
-                            transaction.addToBackStack(null);
-                            FullActivity.homeFragmentIndentifier =  transaction.commit();
-                        }else{
-                            transaction.commit();
-                            Fn.logD("fragment instanceof Book","homeidentifier != -1");
-                        }
-                        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_finished_booking_detail_fragment);
-                    }
+                    String trimmed_response = response.substring(response.indexOf("{"));
+                    Fn.logD("trimmed_response", trimmed_response);
+                    BillGeneratesucces(trimmed_response);
                 }
             }
         }, new Response.ErrorListener() {
@@ -216,6 +194,34 @@ public class BillDetails extends Fragment{
         };
         stringRequest.setTag(TAG);
         Fn.addToRequestQue(requestQueue, stringRequest, getActivity());
+    }
+    public void BillGeneratesucces(String response){
+        if (!Fn.CheckJsonError(response)) {
+            Fn.logD("onResponse", String.valueOf(response));
+            Fn.logD("haha my response is","true");
+            Fragment fragment = new Fragment();
+            fragment = new FinishedBookingDetail();
+            Bundle bundle = new Bundle();
+            bundle.putString("crn_no", crn_no);
+            fragment.setArguments(Fn.CheckBundle(bundle));
+            FragmentManager fragmentManager = FullActivity.fragmentManager;
+            FragmentTransaction transaction = fragmentManager.beginTransaction();
+//                Fragment fragment = new BookNow();
+            transaction.replace(R.id.main_content, fragment, Constants.Config.CURRENT_FRAG_TAG);
+            if((FullActivity.homeFragmentIndentifier == -5)){
+                transaction.addToBackStack(null);
+                FullActivity.homeFragmentIndentifier =  transaction.commit();
+            }else{
+                transaction.commit();
+                Fn.logD("fragment instanceof Book","homeidentifier != -1");
+            }
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_finished_booking_detail_fragment);
+        }else{
+            ErrorDialog(Constants.Title.SERVER_ERROR,Constants.Message.SERVER_ERROR);
+        }
+    }
+    private void ErrorDialog(String Title,String Message){
+        Fn.showDialog(getActivity(), Title, Message);
     }
     @Override
     public void onPause() {

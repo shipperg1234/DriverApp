@@ -51,7 +51,7 @@ public class MainActivity extends AppCompatActivity
             String reg_url = Constants.Config.ROOT_PATH + "driver_registration";
             Random ran = new Random();
             int otp = (100000 + ran.nextInt(900000));
-            Fn.Toast(this,String.valueOf(otp));
+//            Fn.Toast(this,String.valueOf(otp));
 //            Log.d("OTP",String.valueOf(otp));
             String mobile_no = MOBILE_NO.getText().toString();
             HashMap<String,String> hashMap = new HashMap<String, String>();
@@ -61,10 +61,7 @@ public class MainActivity extends AppCompatActivity
             Fn.putPreference(this, "mobile_no", mobile_no);
             Fn.logD("OTP", Fn.getPreference(this, "OTP"));
             sendVolleyRequest(reg_url, Fn.checkParams(hashMap));
-//        PreferenceManager.getDefaultSharedPreferences(this).edit().putString("mobile_no", String.valueOf(mobile_no)).commit();
-//         String method = "register";
-//         BackgroundTask backgroundTask = new BackgroundTask(this);
-//         backgroundTask.execute(method,mobile_no);
+
         }
         else
             Toast.makeText(MainActivity.this, "Form contains error", Toast.LENGTH_LONG).show();
@@ -84,7 +81,9 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(String response) {
                 Fn.logD("onResponse", String.valueOf(response));
-                registerSuccess();
+                String trimmed_response = response.substring(response.indexOf("{"));
+                Fn.logD("trimmed_response", trimmed_response);
+                registerSuccess(trimmed_response);
             }
         }, new Response.ErrorListener() {
             @Override
@@ -102,10 +101,14 @@ public class MainActivity extends AppCompatActivity
         Fn.addToRequestQue(requestQueue, stringRequest, this);
     }
 
-    protected void registerSuccess(){
-        Intent intent = new Intent(this, OtpVerification.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(intent);
+    protected void registerSuccess(String response){
+        if(!Fn.CheckJsonError(response)) {
+            Intent intent = new Intent(this, OtpVerification.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }else{
+            ErrorDialog(Constants.Title.SERVER_ERROR, Constants.Message.SERVER_ERROR);
+        }
     }
     protected void stopGPS(View v) {
         Fn.logD("MAIN_ACTIVITY_LIFECYCLE", "stopGPS called");

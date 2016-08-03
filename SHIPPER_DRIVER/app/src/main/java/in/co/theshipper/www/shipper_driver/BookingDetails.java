@@ -443,19 +443,10 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
             String distance_km  = distance.getString("text");
             JSONObject duration = legs.getJSONObject("duration");
             String duration_min  = duration.getString("text");
-//                      Fn.logD("distance_km",distance_km);
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("");
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(duration_min + " ( " + distance_km + " ) ");
 
             Fn.logD("PolyLine Added", "PolyLineAdded");
-/*           for(int z = 0; z<list.size()-1;z++){
-                LatLng src= list.get(z);
-                LatLng dest= list.get(z+1);
-                Polyline line = mMap.addPolyline(new PolylineOptions()
-                .add(new LatLng(src.latitude, src.longitude), new LatLng(dest.latitude,   dest.longitude))
-                .width(2)
-                .color(Color.BLUE).geodesic(true));
-            }*/
         } catch (JSONException e) {
             e.printStackTrace();
         }

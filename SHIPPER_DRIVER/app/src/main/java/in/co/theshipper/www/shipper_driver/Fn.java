@@ -330,46 +330,6 @@ public class Fn {
             }
         }
     }
-//    protected static String AndroidToServer(Context ctx, String... params) {
-//        Fn.logD("AndroidToServer", "AndroidToServer");
-//        String JSON_STRING;
-//        String return_param = "";
-//        String server_url = params[0];
-//        String data = params[1];
-//        try {
-//            URL url = new URL(server_url);
-//            HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection();
-//            httpURLConnection.setRequestMethod("POST");
-//            httpURLConnection.setDoOutput(true);
-//            OutputStream OS = httpURLConnection.getOutputStream();
-//            BufferedWriter bufferedWriter = new BufferedWriter(new OutputStreamWriter(OS, "UTF-8"));
-//            bufferedWriter.write(data);
-//            bufferedWriter.flush();
-//            bufferedWriter.close();
-//            OS.close();
-//            InputStream IS = httpURLConnection.getInputStream();
-//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(IS));
-//            StringBuilder stringBuilder = new StringBuilder();
-//            //Log.d("JSON_STRING_PREV",JSON_STRING+"JSON_STRING_PREV");
-//            while ((JSON_STRING = bufferedReader.readLine()) != null) {
-//                stringBuilder.append(JSON_STRING + "\n");
-//            }
-//            bufferedReader.close();
-//            IS.close();
-//            Fn.logE("JSON_STRING", JSON_STRING + "JSON_STRING");
-//            return_param = stringBuilder.toString().trim();
-//        } catch (MalformedURLException e) {
-//            e.printStackTrace();
-//            Fn.logE("error1", e.toString());
-//            return_param = "{errFlag='1',errMsg='nothing'}";
-////            Fn.Toast(ctx,"Error while connectng to server");
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            Fn.logE("error2", e.toString());
-//            return_param = "{errFlag='1',errMsg='nothing'}";
-//        }
-//        return return_param;
-//    }
     protected static HashMap<String, String> checkParams(HashMap<String, String> map) {
         Iterator<HashMap.Entry<String, String>> it = map.entrySet().iterator();
         while (it.hasNext()) {

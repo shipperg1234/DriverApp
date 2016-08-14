@@ -32,7 +32,7 @@ public class BillDetails extends Fragment{
     private TextView crn_no_view,vehicle_name,total_distance,total_time,total_fare_view;
     private String truck_name,crn_no = "";
     private long diffsec=0, diffmin=0, diffHours=0;
-    private double totDist = 0,total_fare = 0,distance_fare=0,base_fare_min = 0,chargable_time = 0;
+    private double totDist = 0,total_fare = 0,distance_fare=0,base_fare_min = 0,chargable_time = 0,base_fare=0;
     String  approx_distance,approx_fare;
     private int active=0;
     private Button generate_bill;
@@ -80,6 +80,7 @@ public class BillDetails extends Fragment{
                             hashMap.put("total_fare",String.valueOf(total_fare));
                             hashMap.put("total_time",String.valueOf(diffHours)+" hours "+String.valueOf(diffmin)+" mins "+String.valueOf(diffsec)+" secs");
                             hashMap.put("total_distance",String.valueOf(totDist));
+                            hashMap.put("base_fare",String.valueOf(base_fare));
                             hashMap.put("crn_no",crn_no);
                             hashMap.put(Constants.Keys.USER_TOKEN,Fn.getPreference(getActivity(),Constants.Keys.USER_TOKEN));
                             hashMap.put(Constants.Keys.EXACT_PICKUP_POINT,Fn.getPreference(getActivity(),Constants.Keys.EXACT_PICKUP_POINT));
@@ -130,7 +131,8 @@ public class BillDetails extends Fragment{
                     if(durationf > freewaiting_time){
                         chargable_time = (durationf-freewaiting_time);
                     }
-                    base_fare_min = q1.getDouble(0) + (q1.getDouble(1) * chargable_time);
+                    base_fare = q1.getDouble(0);
+                    base_fare_min = base_fare + (q1.getDouble(1) * chargable_time);
                     //base_fare_max=  (q1.getDouble(0)+(q1.getDouble(1)*durationf*2.5));
                 }
             } catch (Exception e) {
@@ -176,6 +178,7 @@ public class BillDetails extends Fragment{
             @Override
             public void onResponse(String response) {
                 if(method.equals("bill_generated")) {
+                    Fn.logD("response", response);
                     String trimmed_response = response.substring(response.indexOf("{"));
                     Fn.logD("trimmed_response", trimmed_response);
                     BillGeneratesucces(trimmed_response);
@@ -197,7 +200,7 @@ public class BillDetails extends Fragment{
     }
     public void BillGeneratesucces(String response){
         if (!Fn.CheckJsonError(response)) {
-            Fn.logD("onResponse", String.valueOf(response));
+//            Fn.logD("onResponse", String.valueOf(response));
             Fn.logD("haha my response is","true");
             Fragment fragment = new Fragment();
             fragment = new FinishedBookingDetail();

@@ -29,14 +29,10 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity
 {
-    protected  String TAG = MainActivity.class.getName();
-    protected  EditText MOBILE_NO;
-    protected  String mobile_no;
-    protected  TextView textView;
-    protected  Boolean isNetworkEnabled = false;
-    protected  LocationManager locationManager;
+    private  String TAG = MainActivity.class.getName();
+    private  EditText MOBILE_NO;
     protected  RequestQueue requestQueue;
-    protected  HashMap<String,String> hashMap;
+    private int otp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,8 +46,7 @@ public class MainActivity extends AppCompatActivity
 //            Fn.showProgressDialog(Constants.Message.LOADING,this);
             String reg_url = Constants.Config.ROOT_PATH + "driver_registration";
             Random ran = new Random();
-            int otp = (100000 + ran.nextInt(900000));
-//            Fn.Toast(this,String.valueOf(otp));
+            otp = (100000 + ran.nextInt(900000));
 //            Log.d("OTP",String.valueOf(otp));
             String mobile_no = MOBILE_NO.getText().toString();
             HashMap<String,String> hashMap = new HashMap<String, String>();
@@ -69,9 +64,6 @@ public class MainActivity extends AppCompatActivity
     }
     private boolean checkValidation() {
         boolean ret = true;
-
-        //if (!Validation.hasText(etNormalText)) ret = false;
-        //if (!Validation.isEmailAddress(etEmailAddrss, true)) ret = false;
         if (!FormValidation.isPhoneNumber(MOBILE_NO, true)) ret = false;
 
         return ret;
@@ -104,16 +96,12 @@ public class MainActivity extends AppCompatActivity
     protected void registerSuccess(String response){
         if(!Fn.CheckJsonError(response)) {
             Intent intent = new Intent(this, OtpVerification.class);
+            intent.putExtra("OTP", otp);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
         }else{
             ErrorDialog(Constants.Title.SERVER_ERROR, Constants.Message.SERVER_ERROR);
         }
-    }
-    protected void stopGPS(View v) {
-        Fn.logD("MAIN_ACTIVITY_LIFECYCLE", "stopGPS called");
-        //Log.d("stopPlayer", "stopPlayer");
-//        stopService(new Intent(this,GpsTracker.class));
     }
     private void ErrorDialog(String Title,String Message){
         Fn.showDialog(this, Title, Message);

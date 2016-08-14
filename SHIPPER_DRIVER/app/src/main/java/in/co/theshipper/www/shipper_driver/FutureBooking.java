@@ -152,9 +152,6 @@ public class FutureBooking extends Fragment {
             // handle exception
             Fn.logE("log_tag", "Error parsing data " + e.toString());
         }
-       // ListAdapter listAdapter = new SimpleAdapter(getContext(),values,R.layout.booking_list_view,new String[] {"crn_no","vehicle_type","datetime1","pickup_point","dropoff_point","vehicle_image"},
-      //          new int[] {R.id.crn_no,R.id.vehicle_type, R.id.datetime1,R.id.pickup_point,R.id.dropoff_point,R.id.vehicle_image});
-        //list.setAdapter(listAdapter);
         ((BaseAdapter)listAdapter).notifyDataSetChanged();
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

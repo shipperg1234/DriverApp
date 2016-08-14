@@ -72,6 +72,21 @@ public class NewBooking extends Fragment {
         dialog.setContentView(R.layout.dialog);
         dialog.setCancelable(true);
         popup=(ImageView)dialog.findViewById(R.id.image_popup);
+        if((getActivity().getIntent()!=null)&&(getActivity().getIntent().getExtras()!=null)) {
+            Bundle bundle = getActivity().getIntent().getExtras();
+            String crn_no = Fn.getValueFromBundle(bundle, "crn_no");
+            getActivity().getIntent().removeExtra("crn_no");
+            Fn.SystemPrintLn("CRN_NO received" + crn_no);
+            getActivity().getIntent().setData(null);
+            getActivity().setIntent(null);
+            HashMap<String,String>  hashMap= new HashMap<String,String>();
+            final String get_new_booking_url = Constants.Config.ROOT_PATH+"get_new_booking";
+            // String CrnNo = Fn.getPreference(getActivity(),"current_crn_no");
+            Fn.logD("get_new_booking_url",get_new_booking_url);
+            hashMap.put("crn_no", crn_no);
+            hashMap.put("user_token", user_token);
+            sendVolleyRequest(get_new_booking_url, Fn.checkParams(hashMap), "get_new_booking");
+        }
         return view;
     }
 
@@ -115,21 +130,6 @@ public class NewBooking extends Fragment {
                 startActivity(callIntent);
             }
         });
-        if((getActivity().getIntent()!=null)&&(getActivity().getIntent().getExtras()!=null)) {
-            Bundle bundle = getActivity().getIntent().getExtras();
-            String crn_no = Fn.getValueFromBundle(bundle, "crn_no");
-            getActivity().getIntent().removeExtra("crn_no");
-            Fn.SystemPrintLn("CRN_NO received" + crn_no);
-            getActivity().getIntent().setData(null);
-            getActivity().setIntent(null);
-            HashMap<String,String>  hashMap= new HashMap<String,String>();
-            final String get_new_booking_url = Constants.Config.ROOT_PATH+"get_new_booking";
-            // String CrnNo = Fn.getPreference(getActivity(),"current_crn_no");
-            Fn.logD("get_new_booking_url",get_new_booking_url);
-            hashMap.put("crn_no", crn_no);
-            hashMap.put("user_token", user_token);
-            sendVolleyRequest(get_new_booking_url, Fn.checkParams(hashMap), "get_new_booking");
-        }
     }
     protected void sendVolleyRequest(String url, final HashMap<String,String> hashMap, final String method){
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
@@ -194,8 +194,8 @@ public class NewBooking extends Fragment {
                         vehicle_type.setText("Truck: " + Fn.VehicleName(received_vehicletype_id,getActivity()));
                         customer_mobile_no.setText(received_customer_mobile_no);
                         material_weight.setText("Material Weight: "+received_material_weight);
-                        pickup_point.setText("Pickup Point: "+received_pickup_point);
-                        dropoff_point.setText("Dropoff Point: "+received_dropoff_point);
+                        pickup_point.setText(received_pickup_point);
+                        dropoff_point.setText(received_dropoff_point);
                         String received_material_image_url = JO.getString("material_image_url");
                         String download_received_material_image_url = Constants.Config.ROOT_PATH+received_material_image_url;
                         Fn.logD("download_received_material_image_url",download_received_material_image_url);

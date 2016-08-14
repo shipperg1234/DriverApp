@@ -33,30 +33,9 @@ import java.util.TimerTask;
 public class GpsTracker extends Service implements GoogleApiClient.ConnectionCallbacks,GoogleApiClient.OnConnectionFailedListener, com.google.android.gms.location.LocationListener {
     // Get Class Name
     protected RequestQueue requestQueue;
-    protected HashMap<String,String> hashMap;
     private String TAG = GpsTracker.class.getName();
-    //private final Context mContext;
-    // flag for GPS Status
-    private boolean isGPSEnabled = false;
-    // flag for network status
-    private boolean isNetworkEnabled = false;
-    // flag for GPS Tracking is enabled
-    private boolean isGPSTrackingEnabled = false;
     private Location location;
-    private double latitude;
-    private double longitude;
-    // How many Geocoder should return our GPSTracker
-    private int geocoderMaxResults = 1;
-    // The minimum distance to change updates in meters
-    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0; // 10 meters
-    // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 10000 * 15 * 1; // 1 minute
-    // Declaring a Location Manager
-    protected LocationManager locationManager;
-    // Store LocationManager.GPS_PROVIDER or LocationManager.NETWORK_PROVIDER information
-    private String provider_info;
     private String user_token;
-    private Boolean stopTimer = false;
     private Timer timer;
     private GoogleApiClient mGoogleApiClient;
     public GpsTracker() {
@@ -82,21 +61,21 @@ public class GpsTracker extends Service implements GoogleApiClient.ConnectionCal
         mGoogleApiClient.connect();
         Fn.logD("getLocation", "getLocation");
 
-        Intent i = new Intent(this, FullActivity.class);
-        i.putExtra("menuFragment","RateCard");
-        i.putExtra("method","push");
-
-        // Log.d("GPS_SERVICE_START","GPS_SERVICE_START");
-        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-        Notification notification = builder.setContentIntent(pi)
-                .setSmallIcon(R.drawable.vehicle_1).setTicker("SHIPPER").setWhen(System.currentTimeMillis())
-                .setAutoCancel(true).setContentTitle("SHIIPER")
-                .setContentText("Location Tracking in Progress").build();
-        // mNM.notify(NOTIFICATION, notification);
-        notification.flags |= Notification.FLAG_NO_CLEAR;
-        startForeground(1317, notification);
+//        Intent i = new Intent(this, FullActivity.class);
+//        i.putExtra("menuFragment","RateCard");
+//        i.putExtra("method","push");
+//
+//        // Log.d("GPS_SERVICE_START","GPS_SERVICE_START");
+//        i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+//        PendingIntent pi = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
+//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
+//        Notification notification = builder.setContentIntent(pi)
+//                .setSmallIcon(R.drawable.vehicle_1).setTicker("SHIPPER").setWhen(System.currentTimeMillis())
+//                .setAutoCancel(true).setContentTitle("SHIIPER")
+//                .setContentText("Location Tracking in Progress").build();
+//        // mNM.notify(NOTIFICATION, notification);
+//        notification.flags |= Notification.FLAG_NO_CLEAR;
+//        startForeground(1317, notification);
         TimerProgramm();
         return (START_NOT_STICKY);
     }

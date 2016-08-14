@@ -52,9 +52,10 @@ public class FlashActivity extends AppCompatActivity implements GoogleApiClient.
     private SQLiteDatabase database;
     private  HashMap<String, String> queryValues;
     private TextView error_message;
-    private Boolean stopTimer;
+    private Boolean stopTimer = false, stopForEver = false;
     private Timer timer;
     private Location location;
+    private int googleCount = 0;
     private ProgressDialog progressDialog;
     private Boolean isNetworkEnabled = false;
     private Boolean isGpsEnabled = false;
@@ -101,9 +102,7 @@ public class FlashActivity extends AppCompatActivity implements GoogleApiClient.
     protected void onPause() {
         super.onPause();
         Fn.logE("FLASH_ACTIVITY_LIFECYCLE", "onPause Called");
-//        Fn.stopAllVolley(requestQueue);
         if(mGoogleApiClient.isConnected()){
-//            LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
             mGoogleApiClient.disconnect();
         }
         stopTimer = true;
@@ -127,7 +126,7 @@ public class FlashActivity extends AppCompatActivity implements GoogleApiClient.
                         isNetworkEnabled = true;
                         location = Fn.getAccurateCurrentlocation(mGoogleApiClient, this);
                         if (location != null) {
-                            stopTimer = true;
+                            stopForEver = true;
                             new fetch().execute();
                             final Handler handler = new Handler();
                             handler.postDelayed(new Runnable() {
@@ -142,14 +141,13 @@ public class FlashActivity extends AppCompatActivity implements GoogleApiClient.
                             }
                         }
                     } else {
+                        googleCount++;
                         if (timer == null) {
                             TimerProgramm();
                         }
                     }
                 } else {
                     ErrorDialog(Constants.Title.NETWORK_ERROR, Constants.Message.NETWORK_ERROR);
-//                    error_message.setText(Constants.Message.NETWORK_ERROR);
-//                    error_message.setVisibility(View.VISIBLE);
                     if (timer == null) {
                         TimerProgramm();
                     }
@@ -179,7 +177,7 @@ public class FlashActivity extends AppCompatActivity implements GoogleApiClient.
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Fn.SystemPrintLn("FalshActivity_TimerProgram_running");
-                        if (stopTimer != true) {
+                        if ((stopTimer != true)&&(stopForEver != true)) {
                             checkLocation();
                         }
                     }
@@ -194,7 +192,7 @@ public class FlashActivity extends AppCompatActivity implements GoogleApiClient.
                 Fn.logE("isNetworkEnabled", "true");
                 location = Fn.getAccurateCurrentlocation(mGoogleApiClient, this);
                 if (location != null) {
-                    stopTimer = true;
+                    stopForEver = true;
                     Fn.logE("FLASH_ACTIVITY_LIFECYCLE", "onCreate");
                     new fetch().execute();
                     final Handler handler = new Handler();
@@ -205,10 +203,13 @@ public class FlashActivity extends AppCompatActivity implements GoogleApiClient.
                         }
                     }, 2000);
                 }
+            }else {
+                googleCount++;
+                if(googleCount == 3) {
+                    stopForEver = true;
+                    ErrorDialog(Constants.Title.NETWORK_ERROR, Constants.Message.NETWORK_ERROR);
+                }
             }
-        } else {
-//            error_message.setText(Constants.Message.NETWORK_ERROR);
-//            error_message.setVisibility(View.VISIBLE);
         }
     }
     private boolean checkPlayServices() {
@@ -281,7 +282,6 @@ public class FlashActivity extends AppCompatActivity implements GoogleApiClient.
                 try {
 
                     URL url = new URL(url_select);
-
                     HttpURLConnection conn = (HttpURLConnection) url.openConnection();
                     conn.setDoOutput(true);
                     conn.setRequestMethod("POST");

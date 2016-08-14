@@ -5,8 +5,6 @@ public final class Constants {
         protected static final String ROOT_PATH = "http://theshipper.ml/loader_mobile/";
 //        protected static final String ROOT_PATH = "http://www.theshipper.co.in/loader_mobile/";
 //        protected static final String ROOT_PATH = "http://52.77.190.248/";
-//        protected static final String ROOT_PATH = "http://192.168.0.100/loader_mobile/";
-//        protected static final String ROOT_PATH = "http://192.168.0.101/loader_mobile/";
         protected static final int UPDATE_NEW_LOCATION_DELAY = 0*1000;
         protected static final int UPDATE_NEW_LOCATION_PERIOD = 10*1000;
         protected static final int UPDATE_DRIVER_LOCATION_DELAY = 0*1000;

@@ -62,7 +62,7 @@
                 android:layout_alignStart="@+id/textView3"
                 android:layout_below="@+id/view"
                 android:layout_marginTop="44dp"
-                android:text="Customer Name:"
+                android:text="Customer:"
                 android:textColor="@color/Black"
                 android:textSize="12sp" />
             <TextView
@@ -74,7 +74,7 @@
                 android:layout_below="@+id/textView2"
                 android:layout_marginLeft="36dp"
                 android:layout_marginStart="36dp"
-                android:text="Mobile No.:"
+                android:text="Mobile:"
                 android:textColor="@color/Black"
                 android:textSize="12sp"
                 android:layout_marginTop="20dp" />

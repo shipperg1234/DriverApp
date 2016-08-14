@@ -21,28 +21,21 @@ import java.util.HashMap;
 public class OtpVerification extends AppCompatActivity {
     protected  String TAG = OtpVerification.class.getName();
     protected RequestQueue requestQueue;
-    protected HashMap<String,String> hashMap;
     private EditText otp_value;
     private String entered_otp;
     private String OTP;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        Fn.logW("OTP_PROFILE_ACTIVITY_LIFECYCLE","onCreate called");
+        Fn.logW("OTP_PROFILE_ACTIVITY_LIFECYCLE", "onCreate called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_otp_verification);
         otp_value = (EditText) findViewById(R.id.editText2);
-        otp_value.addTextChangedListener(new TextWatcher() {
-            public void afterTextChanged(Editable s) {
-                //FormValidation.isValidOTP(otp_value, true);
-            }
-
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-            }
-        });
+        if(getIntent().getExtras() != null) {
+            Bundle b = getIntent().getExtras();
+            OTP = String.valueOf(b.getInt("OTP"));
+//            Fn.Toast(this, String.valueOf(OTP));
+        }
     }
     @Override
     protected void onRestart() {
@@ -80,7 +73,6 @@ public class OtpVerification extends AppCompatActivity {
         Fn.logW("OTP_PROFILE_ACTIVITY_LIFECYCLE","onDestroy called");
     }
     public void verifyOtp(View view){
-        OTP = Fn.getPreference(this,"OTP");
         if(checkValidation()){
 //            Fn.showProgressDialog(Constants.Message.LOADING,this);
             entered_otp = otp_value.getText().toString();
@@ -90,7 +82,7 @@ public class OtpVerification extends AppCompatActivity {
                 Fn.logD("get_user_info_url",get_user_info_url);
                 mobile_no =  Fn.getPreference(this,"mobile_no");
                 Fn.logD("mobile_no",mobile_no);
-                hashMap = new HashMap<String,String>();
+                HashMap<String,String>  hashMap = new HashMap<String,String>();
                 hashMap.put("mobile_no", mobile_no);
                 sendVolleyRequest(get_user_info_url, Fn.checkParams(hashMap));
             }else{

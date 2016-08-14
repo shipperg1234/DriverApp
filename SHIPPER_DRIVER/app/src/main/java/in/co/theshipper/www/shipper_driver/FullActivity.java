@@ -184,7 +184,6 @@ public class FullActivity extends AppCompatActivity implements GoogleApiClient.C
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
         Fn.logW("FULL_ACTIVITY_LIFECYCLE", "onDestroy called");
     }
 

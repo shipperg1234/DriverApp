@@ -205,6 +205,8 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
                     location = Fn.getAccurateCurrentlocation(FullActivity.mGoogleApiClient, getActivity());
                 } while (location == null);
                 Fn.putPreference(getActivity(), Constants.Keys.EXACT_PICKUP_POINT, Fn.getLocationAddress(location.getLatitude(), location.getLongitude(), getActivity()));
+            }else{
+                Fn.ToastShort(getActivity(), Constants.Message.NETWORK_ERROR);
             }
             stopTimerForever = true;
             Intent intent = new Intent(getActivity(), GPSService.class);
@@ -329,7 +331,7 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
                 runOnUiThread(new Runnable() {
                     public void run() {
                         Fn.logD("TimerProgram_running", "TimerProgram_running");
-                        if (!stopTimer&&!stopTimerForever) {
+                        if (!stopTimer && !stopTimerForever) {
 //                            hashMap.clear();
                             String customer_location_url = Constants.Config.ROOT_PATH + "get_customer_location";
                             HashMap<String, String> hashMap = new HashMap<String, String>();
@@ -373,29 +375,32 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
                          location = Fn.getAccurateCurrentlocation(FullActivity.mGoogleApiClient, getActivity());
                     }while(location ==  null);
                     if (location != null) {
-                        current_lat = location.getLatitude();
-                        current_lng = location.getLongitude();
-                        float c = Fn.getBearing(current_lat,current_lng,Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng));
-                        LatLng latlng = new LatLng(current_lat, current_lng);// This methods gets the users current longitude and latitude.
-//                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));//Moves the camera to users current longitude and latitude
-                        mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL,1,c)));
-//                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL));//Animates camera and zooms to preferred state on the user's current location.
-//                        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                        Fn.logD("received_driver_current_lat", received_customer_current_lat);
-                        Fn.logD("received_driver_current_lng", received_customer_current_lng);
+                        if (mMap != null)
+                        {
+                            current_lat = location.getLatitude();
+                            current_lng = location.getLongitude();
+                            float c = Fn.getBearing(current_lat, current_lng, Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng));
+                            LatLng latlng = new LatLng(current_lat, current_lng);// This methods gets the users current longitude and latitude.
+    //                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));//Moves the camera to users current longitude and latitude
+                            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL, 1, c)));
+    //                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL));//Animates camera and zooms to preferred state on the user's current location.
+    //                        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                            Fn.logD("received_driver_current_lat", received_customer_current_lat);
+                            Fn.logD("received_driver_current_lng", received_customer_current_lng);
 
-                        try {
-                            mMap.addMarker(new MarkerOptions()
-                                    .position(new LatLng(Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng)))
-                                    .title(received_customer_name));
-//                                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble("22.6256"), Double.parseDouble("88.3576"))).title("Driver"));
-                        } catch (NumberFormatException e) {
-                            e.printStackTrace();
+                            try {
+                                mMap.addMarker(new MarkerOptions()
+                                        .position(new LatLng(Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng)))
+                                        .title(received_customer_name));
+    //                                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble("22.6256"), Double.parseDouble("88.3576"))).title("Driver"));
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                            }
+                            String url = makeURL(received_customer_current_lat, received_customer_current_lng, String.valueOf(current_lat), String.valueOf(current_lng));
+                            Log.d("made_url", url);
+                            HashMap<String, String> hashMap = new HashMap<String, String>();
+                            sendVolleyRequest(url, Fn.checkParams(hashMap), "draw_path");
                         }
-                        String url = makeURL(received_customer_current_lat, received_customer_current_lng, String.valueOf(current_lat), String.valueOf(current_lng));
-                        Log.d("made_url", url);
-                        HashMap<String,String> hashMap = new HashMap<String,String>();
-                        sendVolleyRequest(url, Fn.checkParams(hashMap), "draw_path");
                     }
                 }
             }
@@ -431,20 +436,24 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
             JSONObject overviewPolylines = routes.getJSONObject("overview_polyline");
             String encodedString = overviewPolylines.getString("points");
             List<LatLng> list = decodePoly(encodedString);
-            Polyline line = mMap.addPolyline(new PolylineOptions()
-                    .addAll(list)
-                    .width(12)
-                    .color(Color.parseColor("#05b1fb"))//Google maps blue color
-                    .geodesic(true)
-            );
+            if(mMap !=  null) {
+                Polyline line = mMap.addPolyline(new PolylineOptions()
+                                .addAll(list)
+                                .width(12)
+                                .color(Color.parseColor("#05b1fb"))//Google maps blue color
+                                .geodesic(true)
+                );
+            }
             JSONArray legsArray = routes.getJSONArray("legs");
             JSONObject legs = legsArray.getJSONObject(0);
             JSONObject distance = legs.getJSONObject("distance");
             String distance_km  = distance.getString("text");
             JSONObject duration = legs.getJSONObject("duration");
             String duration_min  = duration.getString("text");
+            if(getActivity() != null){
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("");
             ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(duration_min + " ( " + distance_km + " ) ");
+            }
 
             Fn.logD("PolyLine Added", "PolyLineAdded");
         } catch (JSONException e) {

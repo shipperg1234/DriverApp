@@ -162,8 +162,8 @@ public class FinishedBookingDetail extends Fragment{
                             received_crn_no = JO.getString("crn_no");
 //                            crn_no_view.setText(received_crn_no);
                             String received_truck_name = Fn.VehicleName(received_vehicletype_id, getActivity());
-                            String received_driver_name = JO.getString("customer_name");
-                            String received_driver_mobile_no = JO.getString("customer_mobile_no");
+                            String received_customer_name = JO.getString("customer_name");
+                            String received_customer_mobile_no = JO.getString("customer_mobile_no");
                             booking_id = JO.getString("booking_id");
                             customer_rating = Float.parseFloat(JO.getString("customer_rating"));
                             String material_image_url=JO.getString("material_image_url");
@@ -190,10 +190,10 @@ public class FinishedBookingDetail extends Fragment{
                                 ratingBar.setIsIndicator(true);
                             }
                             received_pickup_point_view.setText(received_exact_pickup_point);
-                            received_customer_mobile_no_view.setText(received_driver_mobile_no);
+                            received_customer_mobile_no_view.setText(received_customer_mobile_no);
                             received_dropoff_point_view.setText(received_exact_dropoff_point);
                             received_booking_datetime_view.setText(received_booking_datetime);
-                            received_customer_name_view.setText(received_driver_name);
+                            received_customer_name_view.setText(received_customer_name);
                             received_crn_no_view.setText(received_crn_no);
                             received_truck_name_view.setText(received_truck_name);
                             received_total_fare_view.setText(received_total_fare+" Rs");

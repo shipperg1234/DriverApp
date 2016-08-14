@@ -9,6 +9,8 @@
     <string name="SERVER_ROOT_PATH">www.theshipper.co.in/</string>
     <string name="ACTION_PATH">action/</string>
     <string name="INCLUDE_PATH">includes/</string>
+    <string name="main_activity_otp_text">TheShipper will send an SMS to verify you mobile number.Enter your 10 digit mobile number:</string>
+
 
     <!--Messaqges-->
     <string name="GPSAlertDialogTitle">GPS LOCATION SETTING</string>
@@ -54,7 +56,7 @@
         <item>Calculator</item>
         <item>Emergency Contact</item>
         <item>Support</item>
-        <item>About</item>
+        <item>T&amp;C</item>
         <item>Logout</item>
     </string-array>
     <!--NAVIGATION DRAWER-->

@@ -289,36 +289,36 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
     }
     protected void vehicleLocationSuccess(String response) {
         Fn.logD("BOOKING_DETAILS_FRAGMENT_LIFECYCLE", "vehicleLocationSuccess Called");
-            try {
-                if (!Fn.CheckJsonError(response)) {
-                    JSONObject jsonObject = new JSONObject(response);
-                    //jsonArray = jsonObject.getJSONArray("likes");
-                    String errFlag = jsonObject.getString("errFlag");
-                    String errMsg = jsonObject.getString("errMsg");
-                    if (errFlag.equals("1")) {
-                        Fn.logD("toastNotdone", "toastNotdone");
-                    } else if (errFlag.equals("0")) {
-                        if (jsonObject.has("likes")) {
-                            JSONArray jsonArray = jsonObject.getJSONArray("likes");
-                            int count = 0;
-                            while (count < jsonArray.length()) {
-                                JSONObject JO = jsonArray.getJSONObject(count);
-                                received_customer_current_lat = JO.getString("customer_location_lat");
-                                received_customer_current_lng = JO.getString("customer_location_lng");
-                                String received_location_update_datetime = JO.getString("customer_location_datetime");
-                                location_datetime.setText("Last Seen: " + Fn.getDateName(received_location_update_datetime));
-                                map.setVisibility(View.VISIBLE);
+        try {
+            if (!Fn.CheckJsonError(response)) {
+                JSONObject jsonObject = new JSONObject(response);
+                //jsonArray = jsonObject.getJSONArray("likes");
+                String errFlag = jsonObject.getString("errFlag");
+                String errMsg = jsonObject.getString("errMsg");
+                if (errFlag.equals("1")) {
+                    Fn.logD("toastNotdone", "toastNotdone");
+                } else if (errFlag.equals("0")) {
+                    if (jsonObject.has("likes")) {
+                        JSONArray jsonArray = jsonObject.getJSONArray("likes");
+                        int count = 0;
+                        while (count < jsonArray.length()) {
+                            JSONObject JO = jsonArray.getJSONObject(count);
+                            received_customer_current_lat = JO.getString("customer_location_lat");
+                            received_customer_current_lng = JO.getString("customer_location_lng");
+                            String received_location_update_datetime = JO.getString("customer_location_datetime");
+                            location_datetime.setText("Last Seen: " + Fn.getDateName(received_location_update_datetime));
+                            map.setVisibility(View.VISIBLE);
 //                                map_view.setVisibility(View.GONE);
-                                Fn.logD("LocationSuccessCallingMap", "LocationSuccessCallingMap");
-                                setUpMapIfNeeded();
-                                count++;
-                            }
+                            Fn.logD("LocationSuccessCallingMap", "LocationSuccessCallingMap");
+                            setUpMapIfNeeded();
+                            count++;
                         }
                     }
-                } else {
-//                    ErrorDialog(Constants.Title.SERVER_ERROR, Constants.Message.SERVER_ERROR);
-                   Fn.ToastShort(getActivity(),Constants.Message.SERVER_ERROR);
                 }
+            } else {
+//                    ErrorDialog(Constants.Title.SERVER_ERROR, Constants.Message.SERVER_ERROR);
+                Fn.ToastShort(getActivity(),Constants.Message.SERVER_ERROR);
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -372,7 +372,7 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
                 mMap.setMyLocationEnabled(true);
                 if(FullActivity.mGoogleApiClient.isConnected()) {
                     do{
-                         location = Fn.getAccurateCurrentlocation(FullActivity.mGoogleApiClient, getActivity());
+                        location = Fn.getAccurateCurrentlocation(FullActivity.mGoogleApiClient, getActivity());
                     }while(location ==  null);
                     if (location != null) {
                         if (mMap != null)
@@ -381,10 +381,10 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
                             current_lng = location.getLongitude();
                             float c = Fn.getBearing(current_lat, current_lng, Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng));
                             LatLng latlng = new LatLng(current_lat, current_lng);// This methods gets the users current longitude and latitude.
-    //                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));//Moves the camera to users current longitude and latitude
+                            //                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));//Moves the camera to users current longitude and latitude
                             mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL, 1, c)));
-    //                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL));//Animates camera and zooms to preferred state on the user's current location.
-    //                        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                            //                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL));//Animates camera and zooms to preferred state on the user's current location.
+                            //                        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
                             Fn.logD("received_driver_current_lat", received_customer_current_lat);
                             Fn.logD("received_driver_current_lng", received_customer_current_lng);
 
@@ -392,7 +392,7 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
                                 mMap.addMarker(new MarkerOptions()
                                         .position(new LatLng(Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng)))
                                         .title(received_customer_name));
-    //                                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble("22.6256"), Double.parseDouble("88.3576"))).title("Driver"));
+                                //                                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble("22.6256"), Double.parseDouble("88.3576"))).title("Driver"));
                             } catch (NumberFormatException e) {
                                 e.printStackTrace();
                             }
@@ -451,8 +451,8 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
             JSONObject duration = legs.getJSONObject("duration");
             String duration_min  = duration.getString("text");
             if(getActivity() != null){
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("");
-            ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(duration_min + " ( " + distance_km + " ) ");
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle("");
+                ((AppCompatActivity)getActivity()).getSupportActionBar().setTitle(duration_min + " ( " + distance_km + " ) ");
             }
 
             Fn.logD("PolyLine Added", "PolyLineAdded");

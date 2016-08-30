@@ -1,7 +1,6 @@
 package in.co.theshipper.www.shipper_driver;
 
 
-import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -36,13 +35,17 @@ public class BillDetails extends Fragment{
     String  approx_distance,approx_fare;
     private int active=0;
     private Button generate_bill;
+    private long loading_start_time = 0,unloading_stop_time= 0,journey_start_time =0,journey_stop_time =0, diff = 0;
+    private String loading_start_time_string,unloading_stop_time_string,journey_start_time_string,journey_stop_time_string;
     public BillDetails() {
     // Required empty public constructor
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        controller = new DBController(getActivity());
+        if(getActivity() != null) {
+            controller = new DBController(getActivity());
+        }
         Fn.logD("BILLING_DETAILS_FRAGMENT_LIFECYCLE", "onCreateView");
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_bill_details, container, false);
@@ -58,39 +61,55 @@ public class BillDetails extends Fragment{
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         Fn.logD("BILLING_DETAILS_FRAGMENT_LIFECYCLE", "onActivityCreated");
         super.onActivityCreated(savedInstanceState);
-            if((getActivity().getIntent()!= null)&&(getActivity().getIntent().getExtras()!= null)) {
+        if(getActivity() != null) {
+
+            loading_start_time = Long.parseLong(Fn.getPreference(getActivity(),Constants.Keys.LOADING_START_TIME));
+            unloading_stop_time = Long.parseLong(Fn.getPreference(getActivity(),Constants.Keys.UNLOADING_STOP_TIME));
+            journey_start_time = Long.parseLong(Fn.getPreference(getActivity(),Constants.Keys.JOURNEY_START_TIME));
+            journey_stop_time = Long.parseLong(Fn.getPreference(getActivity(),Constants.Keys.JOURNEY_STOP_TIME));
+            loading_start_time_string = Fn.getDate(loading_start_time);
+            unloading_stop_time_string = Fn.getDate(unloading_stop_time);
+            journey_start_time_string = Fn.getDate(journey_start_time);
+            journey_stop_time_string = Fn.getDate(journey_stop_time);
+            diff = (unloading_stop_time - loading_start_time);
+            diffsec = (diff / (1000) )% 60;
+            diffmin = (diff / (60 * 1000)) % 60;
+            diffHours = diff / (60 * 60 * 1000);
+            if ((getActivity().getIntent() != null) && (getActivity().getIntent().getExtras() != null)) {
                 Bundle bundle = getActivity().getIntent().getExtras();
-                diffsec = (long) bundle.getLong("seconds",0);
-                diffmin = (long) bundle.getLong("minutes",0);
-                diffHours =(long) bundle.getLong("hours", 0);
-                totDist = (double) bundle.getDouble("distance", 0.0);
+                totDist = Double.parseDouble(Fn.getPreference(getActivity(),Constants.Keys.TOTAL_DISTANCE_TAVELLED));
                 getActivity().getIntent().setData(null);
                 getActivity().setIntent(null);
                 Fn.SystemPrintLn("received_diffHours:" + diffHours + "received_diffmin :" + diffmin + "received_diffsec:" + diffsec + "received_totDist:" + totDist);
-                crn_no=  Fn.getValueFromBundle(bundle,"crn_no");
-                if(crn_no.length()>0){
-                    Fn.logD("CRN_NO_NOT_BLANK","CRN_NO"+crn_no);
+                crn_no = Fn.getPreference(getActivity(), Constants.Keys.CRN_NO);
+                if (crn_no.length() > 0) {
+                    Fn.logD("CRN_NO_NOT_BLANK", "CRN_NO" + crn_no);
                     generate_bill.setVisibility(View.VISIBLE);
                     crn_no_view.setVisibility(View.VISIBLE);
                     generate_bill.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            String update_bill_generated_url = Constants.Config.ROOT_PATH+"bill_generated";
-                            HashMap<String,String> hashMap = new HashMap<String, String>();
-                            hashMap.put("total_fare",String.valueOf(total_fare));
-                            hashMap.put("total_time",String.valueOf(diffHours)+" hours "+String.valueOf(diffmin)+" mins "+String.valueOf(diffsec)+" secs");
-                            hashMap.put("total_distance",String.valueOf(totDist));
-                            hashMap.put("base_fare",String.valueOf(base_fare));
-                            hashMap.put("crn_no",crn_no);
-                            hashMap.put(Constants.Keys.USER_TOKEN,Fn.getPreference(getActivity(),Constants.Keys.USER_TOKEN));
-                            hashMap.put(Constants.Keys.EXACT_PICKUP_POINT,Fn.getPreference(getActivity(),Constants.Keys.EXACT_PICKUP_POINT));
-                            hashMap.put(Constants.Keys.EXACT_DROPOFF_POINT,Fn.getPreference(getActivity(),Constants.Keys.EXACT_DROPOFF_POINT));
-                            sendVolleyRequest(update_bill_generated_url,Fn.checkParams(hashMap),"bill_generated");
+                            String update_bill_generated_url = Constants.Config.ROOT_PATH + "bill_generated";
+                            HashMap<String, String> hashMap = new HashMap<String, String>();
+                            hashMap.put("total_fare", String.valueOf(total_fare));
+                            hashMap.put("total_time", String.valueOf(diffHours) + " hours " + String.valueOf(diffmin) + " mins " + String.valueOf(diffsec) + " secs");
+                            hashMap.put("total_distance", String.valueOf(totDist));
+                            hashMap.put("base_fare", String.valueOf(base_fare));
+                            hashMap.put("crn_no", crn_no);
+                            hashMap.put("loading_start_time", loading_start_time_string);
+                            hashMap.put("unloading_end_time", unloading_stop_time_string);
+                            hashMap.put("journey_start_time", journey_start_time_string);
+                            hashMap.put("journey_end_time", journey_stop_time_string);
+                            hashMap.put(Constants.Keys.USER_TOKEN, Fn.getPreference(getActivity(), Constants.Keys.USER_TOKEN));
+                            hashMap.put(Constants.Keys.EXACT_PICKUP_POINT, Fn.getPreference(getActivity(), Constants.Keys.EXACT_PICKUP_POINT));
+                            hashMap.put(Constants.Keys.EXACT_DROPOFF_POINT, Fn.getPreference(getActivity(), Constants.Keys.EXACT_DROPOFF_POINT));
+                            sendVolleyRequest(update_bill_generated_url, Fn.checkParams(hashMap), "bill_generated");
                         }
                     });
                 }
                 calculate();
             }
+        }
     }
     protected void calculate() {
         int vehicletype_id = Integer.parseInt(Fn.getPreference(getContext(), Constants.Keys.VEHICLETYPE_ID));
@@ -174,29 +193,31 @@ public class BillDetails extends Fragment{
         }
     }
     protected void sendVolleyRequest(String URL, final HashMap<String,String> hMap,final String method){
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
-            @Override
-            public void onResponse(String response) {
-                if(method.equals("bill_generated")) {
-                    Fn.logD("response", response);
-                    String trimmed_response = response.substring(response.indexOf("{"));
-                    Fn.logD("trimmed_response", trimmed_response);
-                    BillGeneratesucces(trimmed_response);
+        if(getActivity() != null) {
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, URL, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    if (method.equals("bill_generated")) {
+                        Fn.logD("response", response);
+                        String trimmed_response = response.substring(response.indexOf("{"));
+                        Fn.logD("trimmed_response", trimmed_response);
+                        BillGeneratesucces(trimmed_response);
+                    }
                 }
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Fn.logD("onErrorResponse", String.valueOf(error));
-            }
-        }){
-            @Override
-            protected HashMap<String,String> getParams(){
-                return hMap;
-            }
-        };
-        stringRequest.setTag(TAG);
-        Fn.addToRequestQue(requestQueue, stringRequest, getActivity());
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Fn.logD("onErrorResponse", String.valueOf(error));
+                }
+            }) {
+                @Override
+                protected HashMap<String, String> getParams() {
+                    return hMap;
+                }
+            };
+            stringRequest.setTag(TAG);
+            Fn.addToRequestQue(requestQueue, stringRequest, getActivity());
+        }
     }
     public void BillGeneratesucces(String response){
         if (!Fn.CheckJsonError(response)) {
@@ -218,13 +239,17 @@ public class BillDetails extends Fragment{
                 transaction.commit();
                 Fn.logD("fragment instanceof Book","homeidentifier != -1");
             }
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_finished_booking_detail_fragment);
+            if(getActivity() != null) {
+                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_finished_booking_detail_fragment);
+            }
         }else{
             ErrorDialog(Constants.Title.SERVER_ERROR,Constants.Message.SERVER_ERROR);
         }
     }
     private void ErrorDialog(String Title,String Message){
-        Fn.showDialog(getActivity(), Title, Message);
+        if(getActivity() != null) {
+            Fn.showDialog(getActivity(), Title, Message);
+        }
     }
     @Override
     public void onPause() {

@@ -9,23 +9,23 @@
         style="@style/vertical_LL"
         android:gravity="center">
         <LinearLayout
-         style="@style/horizontal_LL.sm.1"
-            android:id="@+id/start_view"
-            android:gravity="center">
-        <Button
-            style="@style/large_button"
-            android:text="@string/button_start_journey"
-            android:id="@+id/start"
-            />
-        </LinearLayout>
-        <LinearLayout
             style="@style/horizontal_LL.sm.1"
             android:id="@+id/stop_view"
             android:gravity="center">
         <Button
             style="@style/large_button"
             android:text="@string/button_end_journey"
-            android:id="@+id/stop"/>
+            android:id="@+id/stop_journey"/>
+        </LinearLayout>
+        <LinearLayout
+            style="@style/horizontal_LL.sm.1"
+            android:id="@+id/timer_view"
+            android:visibility="gone"
+            android:gravity="center">
+            <Button
+                style="@style/large_button"
+                android:text="@string/button_stop_timer"
+                android:id="@+id/stop_timer"/>
         </LinearLayout>
     </LinearLayout>
 </FrameLayout>

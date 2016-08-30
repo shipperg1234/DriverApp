@@ -79,114 +79,112 @@ public class FinishedBooking extends Fragment {
     }
 
     private void createRequest(final int page_no){
-        final String user_token = Fn.getPreference(getActivity(),"user_token");
-        StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.Config.ROOT_PATH+"driver_completed_booking_list",
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        //Toast.makeText(MainActivity.this,response,Toast.LENGTH_LONG).show();
-                        Fn.logD("Response for FINISHED_BOOKING_FRAGMENT received",response);
-                        uiUpdate(response);
-                    }
-                },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        //Toast.makeText(MainActivity.this,error.toString(),Toast.LENGTH_LONG).show();
-                        Fn.logD("error", ": volley request failed for FINISHED_BOOKING_FRAGMENT");
+        if(getActivity() != null) {
+            final String user_token = Fn.getPreference(getActivity(), "user_token");
+            StringRequest stringRequest = new StringRequest(Request.Method.POST, Constants.Config.ROOT_PATH + "driver_completed_booking_list",
+                    new Response.Listener<String>() {
+                        @Override
+                        public void onResponse(String response) {
+                            //Toast.makeText(MainActivity.this,response,Toast.LENGTH_LONG).show();
+                            Fn.logD("Response for FINISHED_BOOKING_FRAGMENT received", response);
+                            uiUpdate(response);
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            //Toast.makeText(MainActivity.this,error.toString(),Toast.LENGTH_LONG).show();
+                            Fn.logD("error", ": volley request failed for FINISHED_BOOKING_FRAGMENT");
 //                        ErrorDialog(Constants.Title.NETWORK_ERROR, Constants.Message.NETWORK_ERROR);
-                        Fn.ToastShort(getActivity(),Constants.Message.NETWORK_ERROR);
-                    }
-                }){
-            @Override
-            protected Map<String,String> getParams(){
-                Map<String,String> params = new HashMap<String, String>();
-                params.put("user_token", user_token);
-                params.put("page_no",String.valueOf(page_no));
+                            Fn.ToastShort(getActivity(), Constants.Message.NETWORK_ERROR);
+                        }
+                    }) {
+                @Override
+                protected Map<String, String> getParams() {
+                    Map<String, String> params = new HashMap<String, String>();
+                    params.put("user_token", user_token);
+                    params.put("page_no", String.valueOf(page_no));
 //                Fn.logD("user_token",Fn.getPreference(getContext(),"user_token"));
-                return params;
-            }
+                    return params;
+                }
 
-        };
-        requestQueue = Volley.newRequestQueue(getContext());
-        stringRequest.setTag(TAG);
-        requestQueue.add(stringRequest);
-
+            };
+            requestQueue = Volley.newRequestQueue(getContext());
+            stringRequest.setTag(TAG);
+            requestQueue.add(stringRequest);
+        }
     }
     protected void uiUpdate(String response)
     {
-        //ArrayList<HashMap<String,String>> values = new ArrayList<HashMap<String, String>>();
-        try {
-            if(!Fn.CheckJsonError(response)) {
-                String errFlag;
-                String errMsg;
-                JSONObject jsonObject = new JSONObject(response);
-                errFlag = jsonObject.getString("errFlag");
-                errMsg = jsonObject.getString("errMsg");
-                Fn.logD("response errflag and errMsg", errFlag + " " + errMsg);
-                JSONObject UpdationObject;
-                JSONArray jsonArray;
-                if (jsonObject.has("likes")) {
-                    jsonArray = jsonObject.getJSONArray("likes");
-                    int count = 0;
-                    while (count < jsonArray.length()) {
-                        UpdationObject = jsonArray.getJSONObject(count);
-                        HashMap<String, String> qvalues = new HashMap<String, String>();
+        if(getActivity() != null) {
+            //ArrayList<HashMap<String,String>> values = new ArrayList<HashMap<String, String>>();
+            try {
+                if (!Fn.CheckJsonError(response)) {
+                    String errFlag;
+                    String errMsg;
+                    JSONObject jsonObject = new JSONObject(response);
+                    errFlag = jsonObject.getString("errFlag");
+                    errMsg = jsonObject.getString("errMsg");
+                    Fn.logD("response errflag and errMsg", errFlag + " " + errMsg);
+                    JSONObject UpdationObject;
+                    JSONArray jsonArray;
+                    if (jsonObject.has("likes")) {
+                        jsonArray = jsonObject.getJSONArray("likes");
+                        int count = 0;
+                        while (count < jsonArray.length()) {
+                            UpdationObject = jsonArray.getJSONObject(count);
+                            HashMap<String, String> qvalues = new HashMap<String, String>();
 //                    Fn.logD("crn_no and datetime1 recieved ",UpdationObject.get("crn_no").toString()+UpdationObject.get("datetime1").toString());
-                        qvalues.put("crn_no", UpdationObject.get("crn_no").toString());
-                        qvalues.put("datetime1", Fn.getDateName(UpdationObject.get("booking_datetime").toString()));
-                        qvalues.put("vehicle_type", Fn.VehicleName(UpdationObject.get("vehicletype_id").toString(), getActivity()));
-                        qvalues.put("pickup_point", UpdationObject.get("pickup_point").toString());
-                        qvalues.put("dropoff_point", UpdationObject.get("dropoff_point").toString());
-                        qvalues.put("vehicle_image", Integer.toString(Fn.getVehicleImage(Integer.parseInt(UpdationObject.get("vehicletype_id").toString()))));
-                        values.add(qvalues);
-                        count++;
+                            qvalues.put("crn_no", UpdationObject.get("crn_no").toString());
+                            qvalues.put("datetime1", Fn.getDateName(UpdationObject.get("booking_datetime").toString()));
+                            qvalues.put("vehicle_type", Fn.VehicleName(UpdationObject.get("vehicletype_id").toString(), getActivity()));
+                            qvalues.put("pickup_point", UpdationObject.get("pickup_point").toString());
+                            qvalues.put("dropoff_point", UpdationObject.get("dropoff_point").toString());
+                            qvalues.put("vehicle_image", Integer.toString(Fn.getVehicleImage(Integer.parseInt(UpdationObject.get("vehicletype_id").toString()))));
+                            values.add(qvalues);
+                            count++;
+                        }
                     }
-                }
-            }else{
+                } else {
 //                ErrorDialog(Constants.Title.SERVER_ERROR,Constants.Message.SERVER_ERROR);
-                Fn.ToastShort(getActivity(),Constants.Message.SERVER_ERROR);
-            }
-        }
-        catch(Exception e)
-        {
-            // handle exception
-            Fn.logE("log_tag", "Error parsing data " + e.toString());
-        }
-        Fn.logD("Setting adapter", "for finished booking");
-        //list.setAdapter(listAdapter);
-        ((BaseAdapter)listAdapter).notifyDataSetChanged();
-        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                View child_view = list.getChildAt(position-list.getFirstVisiblePosition());
-                TextView crn_no = (TextView) child_view.findViewById(R.id.crn_no);
-                Fn.logD("Child View  :",String.valueOf(child_view));
-//                String PhoneNum = number.getText().toString();
-                Fn.logD("onItemClick", "list clicked at position: " + position + " value crn_no =" + crn_no.getText());
-//                Fragment fragment = new Fragment();
-                Fragment fragment = new FinishedBookingDetail();
-                Bundle bundle = new Bundle();
-                bundle.putString("crn_no", crn_no.getText().toString());
-                fragment.setArguments(Fn.CheckBundle(bundle));
-                FragmentManager fragmentManager = FullActivity.fragmentManager;
-                FragmentTransaction transaction = fragmentManager.beginTransaction();
-//                Fragment fragment = new BookNow();
-                transaction.replace(R.id.main_content, fragment, Constants.Config.CURRENT_FRAG_TAG);
-                if((FullActivity.homeFragmentIndentifier == -5)){
-                    transaction.addToBackStack(null);
-                    FullActivity.homeFragmentIndentifier =  transaction.commit();
-                }else{
-                    transaction.commit();
-                    Fn.logD("fragment instanceof Book","homeidentifier != -1");
+                    Fn.ToastShort(getActivity(), Constants.Message.SERVER_ERROR);
                 }
-                ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_finished_booking_detail_fragment);
-
+            } catch (Exception e) {
+                // handle exception
+                Fn.logE("log_tag", "Error parsing data " + e.toString());
             }
-        });
-    }
-    private void ErrorDialog(String Title,String Message){
-        Fn.showDialog(getActivity(), Title, Message);
+            Fn.logD("Setting adapter", "for finished booking");
+            //list.setAdapter(listAdapter);
+            ((BaseAdapter) listAdapter).notifyDataSetChanged();
+            list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    View child_view = list.getChildAt(position - list.getFirstVisiblePosition());
+                    TextView crn_no = (TextView) child_view.findViewById(R.id.crn_no);
+                    Fn.logD("Child View  :", String.valueOf(child_view));
+//                String PhoneNum = number.getText().toString();
+                    Fn.logD("onItemClick", "list clicked at position: " + position + " value crn_no =" + crn_no.getText());
+//                Fragment fragment = new Fragment();
+                    Fragment fragment = new FinishedBookingDetail();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("crn_no", crn_no.getText().toString());
+                    fragment.setArguments(Fn.CheckBundle(bundle));
+                    FragmentManager fragmentManager = FullActivity.fragmentManager;
+                    FragmentTransaction transaction = fragmentManager.beginTransaction();
+//                Fragment fragment = new BookNow();
+                    transaction.replace(R.id.main_content, fragment, Constants.Config.CURRENT_FRAG_TAG);
+                    if ((FullActivity.homeFragmentIndentifier == -5)) {
+                        transaction.addToBackStack(null);
+                        FullActivity.homeFragmentIndentifier = transaction.commit();
+                    } else {
+                        transaction.commit();
+                        Fn.logD("fragment instanceof Book", "homeidentifier != -1");
+                    }
+                    ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.title_finished_booking_detail_fragment);
+
+                }
+            });
+        }
     }
     @Override
     public void onResume() {

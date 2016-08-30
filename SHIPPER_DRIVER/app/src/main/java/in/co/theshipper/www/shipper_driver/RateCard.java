@@ -52,42 +52,44 @@ public class RateCard extends Fragment {
     public void onCreate( Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        controller = new DBController(getActivity());
-        database = controller.getWritableDatabase();
-        Cursor cit = database.rawQuery(query1, null);
-        Cursor truc = database.rawQuery(query2, null);
+        if(getActivity() != null) {
+            controller = new DBController(getActivity());
+            database = controller.getWritableDatabase();
+            Cursor cit = database.rawQuery(query1, null);
+            Cursor truc = database.rawQuery(query2, null);
 
-        city.add("Select City");
-        truck.add("Select Truck");
-        Fn.SystemPrintLn("rating entered onCreate");
-        try {
-            if (cit.moveToFirst()) {
-                do {
-                    city.add(cit.getString(0));
-                } while (cit.moveToNext());
+            city.add("Select City");
+            truck.add("Select Truck");
+            Fn.SystemPrintLn("rating entered onCreate");
+            try {
+                if (cit.moveToFirst()) {
+                    do {
+                        city.add(cit.getString(0));
+                    } while (cit.moveToNext());
+                }
+            } catch (Exception e) {
+                Fn.SystemPrintLn("no rows");
             }
-        } catch (Exception e) {
-            Fn.SystemPrintLn("no rows");
-        }
-        try {
-            if (truc.moveToFirst()) {
-                do {
-                    truck.add(truc.getString(0));
-                } while (truc.moveToNext());
+            try {
+                if (truc.moveToFirst()) {
+                    do {
+                        truck.add(truc.getString(0));
+                    } while (truc.moveToNext());
+                }
+            } catch (Exception e) {
+                Fn.SystemPrintLn("no rows");
             }
-        } catch (Exception e) {
-            Fn.SystemPrintLn("no rows");
-        }
-        database.close();
-        Fn.SystemPrintLn(truck);
+            database.close();
+            Fn.SystemPrintLn(truck);
 
-        Fn.SystemPrintLn("before adapter");
-        adapter_truck = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, truck);
-        adapter_city = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, city);
-        Fn.SystemPrintLn(adapter_city);
-        Fn.SystemPrintLn(truck);
-        //ArrayAdapter.createFromResource()
-        //adapterp.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            Fn.SystemPrintLn("before adapter");
+            adapter_truck = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, truck);
+            adapter_city = new ArrayAdapter<String>(getContext(), android.R.layout.simple_spinner_dropdown_item, city);
+            Fn.SystemPrintLn(adapter_city);
+            Fn.SystemPrintLn(truck);
+            //ArrayAdapter.createFromResource()
+            //adapterp.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        }
 
     }
 

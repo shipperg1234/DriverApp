@@ -38,6 +38,8 @@
     <string name="button_text_update">UPDATE</string>
     <string name="button_start_journey">START JOURNEY</string>
     <string name="button_end_journey">END JOURNEY</string>
+    <string name="button_start_timer">START TIMER</string>
+    <string name="button_stop_timer">STOP TIMER</string>
     <string name="button_generate_bill">GENERATE BILL</string>
 
     <string name="button_text_cancel">CANCEL</string>

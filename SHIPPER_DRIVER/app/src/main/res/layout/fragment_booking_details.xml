@@ -16,10 +16,23 @@
         <LinearLayout
             style="@style/horizontal_LL.sm.1"
             android:id="@+id/start_view">
-            <Button
-                style="@style/full_screen_button"
-                android:text="@string/button_start_journey"
-                android:id="@+id/start" />
+            <LinearLayout
+             style="@style/vertical_LL.sm.1"
+                android:id="@+id/start_journey_view"
+                android:visibility="gone">
+                <Button
+                    style="@style/full_screen_button"
+                    android:text="@string/button_start_journey"
+                    android:id="@+id/start_journey" />
+            </LinearLayout>
+            <LinearLayout
+                style="@style/vertical_LL.sm.1"
+                android:id="@+id/start_timer_view">
+                <Button
+                    style="@style/full_screen_button"
+                    android:text="@string/button_start_timer"
+                    android:id="@+id/start_timer" />
+            </LinearLayout>
         </LinearLayout>
         <LinearLayout
             style="@style/horizontal_LL.sm.8"

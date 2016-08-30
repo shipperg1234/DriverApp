@@ -140,7 +140,10 @@ public class GpsTracker extends Service implements GoogleApiClient.ConnectionCal
             public void onErrorResponse(VolleyError error) {
                 Fn.logD("onErrorResponse", String.valueOf(error));
 //                ErrorDialog(Constants.Title.NETWORK_ERROR,Constants.Message.NETWORK_ERROR);
-                Fn.ToastShort(getApplicationContext(),Constants.Message.TRACKING_ERROR);
+                if(getApplicationContext() != null) {
+                    Fn.ToastShort(getApplicationContext(), Constants.Message.TRACKING_ERROR);
+                }
+
             }
         }){
             @Override

@@ -12,7 +12,7 @@ public final class Constants {
         protected static final int GET_CUSTOMER_LOCATION_DELAY = 0*1000;
         protected static final int GET_CUSTOMER_LOCATION_PERIOD = 30*1000;
         protected static final int SEND_DISTANCE_REQUEST_DELAY = 0*1000;
-        protected static final int SEND_DISTANCE_REQUEST_PERIOD = 20*1000;
+        protected static final int SEND_DISTANCE_REQUEST_PERIOD = 120*1000;
         protected static final long MIN_DATE_DURATION = 1*1000;
         protected static final long MAX_DATE_DURATION = 6*24*60*60*1000;
         public static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 0;
@@ -29,7 +29,7 @@ public final class Constants {
         protected static final int GPS_INTERVAL = 10*1000;
         protected static final int GPS_FASTEST_INTERVAL = 5*1000;
         protected static final int PROGRESSBAR_DELAY = 2*1000;
-        protected static final int ACURATE_DISTANCE_RATIO_FACTOR = 3;
+        protected static final double[[[[[[[[[]]]]]]]]] ACURATE_DISTANCE_RATIO_FACTOR = 1.5;
         protected static final int IMAGE_WIDTH = 500;
         protected static final int IMAGE_HEIGHT = 500;
     }
@@ -59,9 +59,15 @@ public final class Constants {
     public static final class Keys{
         protected static final String VEHICLETYPE_ID = "vehicletype_id";
         protected static final String USER_TOKEN = "user_token";
+        protected static final String CRN_NO = "crn_no";
         protected static final String USER_ID = "user_id";
         protected static final String CITY_ID = "city_id";
         protected static final String EXACT_PICKUP_POINT = "exact_pickup_point";
         protected static final String EXACT_DROPOFF_POINT = "exact_dropoff_point";
+        protected static final String LOADING_START_TIME = "loading_start_time";
+        protected static final String UNLOADING_STOP_TIME = "unloading_stop_time";
+        protected static final String JOURNEY_START_TIME = "journey_start_time";
+        protected static final String JOURNEY_STOP_TIME = "journey_stop_time";
+        protected static final String TOTAL_DISTANCE_TAVELLED = "total_distance_travelled";
     }
 }

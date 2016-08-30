@@ -50,8 +50,10 @@ import org.json.JSONObject;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
+import java.util.TimeZone;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -65,9 +67,9 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
     private String TAG = BookingDetails.class.getName();
     protected View view;
     protected Context context;
-    private LinearLayout map, start_view, stop_view;
+    private LinearLayout map, start_view, start_journey_view,start_timer_view;
     private TextView location_datetime, map_view;
-    private Button callButton, start, stop;
+    private Button callButton, start_journey, start_timer;
     private SupportMapFragment mMapFragment;
     public GoogleMap mMap = null;
     private LocationManager locationManager;
@@ -85,6 +87,8 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
     private static final int REQUEST_CHECK_SETTINGS = 0x1;
     private ImageView material_image,popup,vehicle_image;
     private Dialog dialog;
+    private Calendar calendar1,calendar2;
+    private long journey_start_time = 0, loading_start_time = 0;
 
     @Override
     public void onAttach(Context context) {
@@ -100,27 +104,32 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        Fn.logD("BOOKING_DETAILS_FRAGMENT_LIFECYCLE", "onCreateView Called");
-        if((getActivity().getIntent()!=null)&&(getActivity().getIntent().getExtras()!=null)) {
-            Bundle bundle = getActivity().getIntent().getExtras();
-            crn_no = Fn.getValueFromBundle(bundle,"crn_no");
-            getActivity().getIntent().setData(null);
-            getActivity().setIntent(null);
-        }else if(this.getArguments()!=null) {
-            Bundle bundle = this.getArguments();
-            crn_no = Fn.getValueFromBundle(bundle, "crn_no");
-        }
         view = inflater.inflate(R.layout.fragment_booking_details, container, false);
         start_view = (LinearLayout) view.findViewById(R.id.start_view);
-        start = (Button) view.findViewById(R.id.start);
+        start_journey_view = (LinearLayout) view.findViewById(R.id.start_journey_view);
+        start_timer_view = (LinearLayout) view.findViewById(R.id.start_timer_view);
+        start_journey = (Button) view.findViewById(R.id.start_journey);
+        start_timer = (Button) view.findViewById(R.id.start_timer);
         map = (LinearLayout) view.findViewById(R.id.map);
         callButton = (Button) view.findViewById(R.id.customer_mobile_no);
         material_image = (ImageView) view.findViewById(R.id.material_image);
-        dialog = new Dialog(getActivity());
-        dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog);
-        dialog.setCancelable(true);
-        popup=(ImageView)dialog.findViewById(R.id.image_popup);
+        Fn.logD("BOOKING_DETAILS_FRAGMENT_LIFECYCLE", "onCreateView Called");
+        if(getActivity() != null){
+            if ((getActivity().getIntent() != null) && (getActivity().getIntent().getExtras() != null)) {
+                Bundle bundle = getActivity().getIntent().getExtras();
+                crn_no = Fn.getValueFromBundle(bundle, "crn_no");
+                getActivity().getIntent().setData(null);
+                getActivity().setIntent(null);
+            } else if (this.getArguments() != null) {
+                Bundle bundle = this.getArguments();
+                crn_no = Fn.getValueFromBundle(bundle, "crn_no");
+            }
+            dialog = new Dialog(getActivity());
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.dialog);
+            dialog.setCancelable(true);
+            popup = (ImageView) dialog.findViewById(R.id.image_popup);
+       }
         callButton.setOnClickListener(this);
         Fn.logD("Map Added", "Map Added");
         return view;
@@ -134,7 +143,6 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
         mMapFragment = SupportMapFragment.newInstance();
         getChildFragmentManager().beginTransaction().replace(R.id.map, mMapFragment, "MAP_FRAGMENT").commit();
         HashMap<String, String> hashMap = new HashMap<String, String>();
-        // String CrnNo = Fn.getPreference(getActivity(),"current_crn_no");
         String user_token = Fn.getPreference(context, "user_token");
         hashMap.put("crn_no", crn_no);
         hashMap.put("user_token", user_token);
@@ -144,23 +152,48 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        if(Fn.isMyServiceRunning(GPSService.class,getActivity())==true){
-            stopTimerForever = true;
-            start_view.setVisibility(View.GONE);
-        }
-//
-        start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String change_driver_status = Constants.Config.ROOT_PATH + "change_driver_status";
-                HashMap<String, String> hashMap = new HashMap<String, String>();
-                hashMap.put("user_token", Fn.getPreference(getActivity(), Constants.Keys.USER_TOKEN));
-                hashMap.put("status", "1");
-                sendVolleyRequest(change_driver_status, Fn.checkParams(hashMap), "change_status");
-
+        if(getActivity() != null) {
+            if (Fn.isMyServiceRunning(GPSService.class, getActivity()) == true) {
+                stopTimerForever = true;
+                start_view.setVisibility(View.GONE);
+            }else if(Fn.isMyServiceRunning(TimerService.class, getActivity()) == true) {
+                start_journey_view.setVisibility(View.VISIBLE);
+                start_timer_view.setVisibility(View.GONE);
             }
 
-        });
+            start_timer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TimeZone tz = TimeZone.getTimeZone("GMT+05:30");
+                    calendar1 = Calendar.getInstance(tz);
+                    loading_start_time = calendar1.getTimeInMillis();
+                    Fn.putPreference(getActivity(),Constants.Keys.LOADING_START_TIME,String.valueOf(loading_start_time));
+                    start_journey_view.setVisibility(View.VISIBLE);
+                    start_timer_view.setVisibility(View.GONE);
+                    Fn.logD("start_timer","TimerService Called");
+                    Intent intent = new Intent(getActivity(), TimerService.class);
+                    getActivity().startService(intent);
+                }
+
+            });
+            start_journey.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    TimeZone tz = TimeZone.getTimeZone("GMT+05:30");
+                    calendar2 = Calendar.getInstance(tz);
+                    journey_start_time = calendar2.getTimeInMillis();
+                    Fn.putPreference(getActivity(),Constants.Keys.JOURNEY_START_TIME,String.valueOf(journey_start_time));
+                    String change_driver_status = Constants.Config.ROOT_PATH + "change_driver_status";
+                    HashMap<String, String> hashMap = new HashMap<String, String>();
+                    hashMap.put("user_token", Fn.getPreference(getActivity(), Constants.Keys.USER_TOKEN));
+                    hashMap.put("status", "1");
+                    sendVolleyRequest(change_driver_status, Fn.checkParams(hashMap), "change_status");
+
+                }
+
+            });
+
+        }
     }
 
     protected void sendVolleyRequest(String URL, final HashMap<String, String> hMap, final String method) {
@@ -186,7 +219,9 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Fn.logD("onErrorResponse", String.valueOf(error));
-                Fn.ToastShort(getActivity(), Constants.Message.NETWORK_ERROR);
+                if(getActivity() != null) {
+                    Fn.ToastShort(getActivity(), Constants.Message.NETWORK_ERROR);
+                }
             }
         }) {
             @Override
@@ -195,25 +230,33 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
             }
         };
         stringRequest.setTag(TAG);
-        Fn.addToRequestQue(requestQueue, stringRequest, getActivity());
+        if(getActivity() != null) {
+            Fn.addToRequestQue(requestQueue, stringRequest, getActivity());
+        }
     }
 
     protected void statusChangeSuccess(String response){
-        if(!Fn.CheckJsonError(response)) {
-            if (FullActivity.mGoogleApiClient.isConnected()) {
-                do {
-                    location = Fn.getAccurateCurrentlocation(FullActivity.mGoogleApiClient, getActivity());
-                } while (location == null);
-                Fn.putPreference(getActivity(), Constants.Keys.EXACT_PICKUP_POINT, Fn.getLocationAddress(location.getLatitude(), location.getLongitude(), getActivity()));
-            }else{
-                Fn.ToastShort(getActivity(), Constants.Message.NETWORK_ERROR);
+        if(getActivity() != null) {
+            if(!Fn.CheckJsonError(response)) {
+                Intent i = new Intent(getActivity(), TimerService.class);
+                getActivity().stopService(i);
+                if (FullActivity.mGoogleApiClient.isConnected()) {
+                    do {
+                        location = Fn.getAccurateCurrentlocation(FullActivity.mGoogleApiClient, getActivity());
+                    } while (location == null);
+                    Fn.putPreference(getActivity(), Constants.Keys.EXACT_PICKUP_POINT, Fn.getLocationAddress(location.getLatitude(), location.getLongitude(), getActivity()));
+                } else {
+                    Fn.ToastShort(getActivity(), Constants.Message.NETWORK_ERROR);
+                }
+                stopTimerForever = true;
+                Intent Intent = new Intent(getActivity(), TimerService.class);
+                getActivity().stopService(Intent);
+                Intent intent = new Intent(getActivity(), GPSService.class);
+                intent.putExtra("crn_no", received_crn_no);
+                Fn.SystemPrintLn("Started tracking");
+                start_view.setVisibility(View.GONE);
+                getActivity().startService(Fn.CheckIntent(intent));
             }
-            stopTimerForever = true;
-            Intent intent = new Intent(getActivity(), GPSService.class);
-            intent.putExtra("crn_no", received_crn_no);
-            Fn.SystemPrintLn("Started tracking");
-            start_view.setVisibility(View.GONE);
-            getActivity().startService(Fn.CheckIntent(intent));
         }
     }
     protected void bookingStatusSuccess(String response) {
@@ -317,7 +360,9 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
                 }
             } else {
 //                    ErrorDialog(Constants.Title.SERVER_ERROR, Constants.Message.SERVER_ERROR);
-                Fn.ToastShort(getActivity(),Constants.Message.SERVER_ERROR);
+                if(getActivity() != null) {
+                    Fn.ToastShort(getActivity(), Constants.Message.SERVER_ERROR);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
@@ -344,62 +389,63 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
         }, Constants.Config.GET_CUSTOMER_LOCATION_DELAY, Constants.Config.GET_CUSTOMER_LOCATION_PERIOD);
     }
     protected void setUpMapIfNeeded() {
-        Fn.logD("setUpMapIfNeeded", "map_setup" + String.valueOf(mMap));
-        // Do a null check to confirm that we have not already instantiated the map.
-        if (mMap != null) {
-            mMap.clear();
-            mMap = null;
-        }
-        if (mMap == null) {
+        if(getActivity() != null) {
+            Fn.logD("setUpMapIfNeeded", "map_setup" + String.valueOf(mMap));
+            // Do a null check to confirm that we have not already instantiated the map.
+            if (mMap != null) {
+                mMap.clear();
+                mMap = null;
+            }
+            if (mMap == null) {
 //            Try to obtain the map from the SupportMapFragment.
 //            mMapFragment = (SupportMapFragment) getChildFragmentManager().findFragmentByTag("MAP_FRAGMENT");
-            Fn.logD("mMapFragment", String.valueOf(mMapFragment));
-            mMap = mMapFragment.getMap();
-            Fn.logD("map_not_null", String.valueOf(mMap));
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
+                Fn.logD("mMapFragment", String.valueOf(mMapFragment));
+                mMap = mMapFragment.getMap();
+                Fn.logD("map_not_null", String.valueOf(mMap));
+                // Check if we were successful in obtaining the map.
+                if (mMap != null) {
 
-                if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    // TODO: Consider calling
-                    //    ActivityCompat#requestPermissions
-                    // here to request the missing permissions, and then overriding
-                    //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                    //                                          int[] grantResults)
-                    // to handle the case where the user grants the permission. See the documentation
-                    // for ActivityCompat#requestPermissions for more details.
-                    return;
-                }
-                mMap.setMyLocationEnabled(true);
-                if(FullActivity.mGoogleApiClient.isConnected()) {
-                    do{
-                        location = Fn.getAccurateCurrentlocation(FullActivity.mGoogleApiClient, getActivity());
-                    }while(location ==  null);
-                    if (location != null) {
-                        if (mMap != null)
-                        {
-                            current_lat = location.getLatitude();
-                            current_lng = location.getLongitude();
-                            float c = Fn.getBearing(current_lat, current_lng, Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng));
-                            LatLng latlng = new LatLng(current_lat, current_lng);// This methods gets the users current longitude and latitude.
-                            //                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));//Moves the camera to users current longitude and latitude
-                            mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL, 1, c)));
-                            //                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL));//Animates camera and zooms to preferred state on the user's current location.
-                            //                        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
-                            Fn.logD("received_driver_current_lat", received_customer_current_lat);
-                            Fn.logD("received_driver_current_lng", received_customer_current_lng);
+                    if (ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                        // TODO: Consider calling
+                        //    ActivityCompat#requestPermissions
+                        // here to request the missing permissions, and then overriding
+                        //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                        //                                          int[] grantResults)
+                        // to handle the case where the user grants the permission. See the documentation
+                        // for ActivityCompat#requestPermissions for more details.
+                        return;
+                    }
+                    mMap.setMyLocationEnabled(true);
+                    if (FullActivity.mGoogleApiClient.isConnected()) {
+                        do {
+                            location = Fn.getAccurateCurrentlocation(FullActivity.mGoogleApiClient, getActivity());
+                        } while (location == null);
+                        if (location != null) {
+                            if (mMap != null) {
+                                current_lat = location.getLatitude();
+                                current_lng = location.getLongitude();
+                                float c = Fn.getBearing(current_lat, current_lng, Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng));
+                                LatLng latlng = new LatLng(current_lat, current_lng);// This methods gets the users current longitude and latitude.
+                                //                        mMap.moveCamera(CameraUpdateFactory.newLatLng(latlng));//Moves the camera to users current longitude and latitude
+                                mMap.moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL, 1, c)));
+                                //                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latlng, Constants.Config.MAP_HIGH_ZOOM_LEVEL));//Animates camera and zooms to preferred state on the user's current location.
+                                //                        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
+                                Fn.logD("received_driver_current_lat", received_customer_current_lat);
+                                Fn.logD("received_driver_current_lng", received_customer_current_lng);
 
-                            try {
-                                mMap.addMarker(new MarkerOptions()
-                                        .position(new LatLng(Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng)))
-                                        .title(received_customer_name));
-                                //                                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble("22.6256"), Double.parseDouble("88.3576"))).title("Driver"));
-                            } catch (NumberFormatException e) {
-                                e.printStackTrace();
+                                try {
+                                    mMap.addMarker(new MarkerOptions()
+                                            .position(new LatLng(Double.parseDouble(received_customer_current_lat), Double.parseDouble(received_customer_current_lng)))
+                                            .title(received_customer_name));
+                                    //                                mMap.addMarker(new MarkerOptions().position(new LatLng(Double.parseDouble("22.6256"), Double.parseDouble("88.3576"))).title("Driver"));
+                                } catch (NumberFormatException e) {
+                                    e.printStackTrace();
+                                }
+                                String url = makeURL(received_customer_current_lat, received_customer_current_lng, String.valueOf(current_lat), String.valueOf(current_lng));
+                                Log.d("made_url", url);
+                                HashMap<String, String> hashMap = new HashMap<String, String>();
+                                sendVolleyRequest(url, Fn.checkParams(hashMap), "draw_path");
                             }
-                            String url = makeURL(received_customer_current_lat, received_customer_current_lng, String.valueOf(current_lat), String.valueOf(current_lng));
-                            Log.d("made_url", url);
-                            HashMap<String, String> hashMap = new HashMap<String, String>();
-                            sendVolleyRequest(url, Fn.checkParams(hashMap), "draw_path");
                         }
                     }
                 }
@@ -492,23 +538,27 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
         return poly;
     }
     private void ErrorDialog(String Title,String Message){
-        Fn.showDialog(getActivity(), Title, Message);
+        if(getActivity() != null) {
+            Fn.showDialog(getActivity(), Title, Message);
+        }
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
+        if(getActivity() != null) {
+            switch (requestCode) {
 // Check for the integer request code originally supplied to startResolutionForResult().
-            case REQUEST_CHECK_SETTINGS:
-                switch (resultCode) {
-                    case Activity.RESULT_OK:
+                case REQUEST_CHECK_SETTINGS:
+                    switch (resultCode) {
+                        case Activity.RESULT_OK:
 //                        startLocationUpdates();
 //                        TimerProgramm();
-                        break;
-                    case Activity.RESULT_CANCELED:
-                        Fn.showGpsAutoEnableRequest(FullActivity.mGoogleApiClient, getActivity());//keep asking if imp or do whatever
-                        break;
-                }
-                break;
+                            break;
+                        case Activity.RESULT_CANCELED:
+                            Fn.showGpsAutoEnableRequest(FullActivity.mGoogleApiClient, getActivity());//keep asking if imp or do whatever
+                            break;
+                    }
+                    break;
+            }
         }
     }
 
@@ -521,25 +571,27 @@ public class BookingDetails extends Fragment implements View.OnClickListener {
         startActivity(callIntent);
     }
     protected void downloadBitmapFromURL(String profile_pic_url){
+        if(getActivity() != null) {
 //        RequestQueue requestQueue;
-        final Bitmap[] return_param = new Bitmap[1];
-        ImageRequest imageRequest = new ImageRequest(profile_pic_url, new Response.Listener<Bitmap>() {
-            @Override
-            public void onResponse(final Bitmap response) {
-                material_image.setImageBitmap(response);
-                material_image.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        popup.setImageBitmap(response);
-                        dialog.show();
-                    }
-                });
+            final Bitmap[] return_param = new Bitmap[1];
+            ImageRequest imageRequest = new ImageRequest(profile_pic_url, new Response.Listener<Bitmap>() {
+                @Override
+                public void onResponse(final Bitmap response) {
+                    material_image.setImageBitmap(response);
+                    material_image.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            popup.setImageBitmap(response);
+                            dialog.show();
+                        }
+                    });
 //                driverimage = response;
-            }
-        }, 0, 0, null, null);
-        imageRequest.setTag(TAG);
-        Fn.addToRequestQue(requestQueue, imageRequest, getActivity()
-        );
+                }
+            }, 0, 0, null, null);
+            imageRequest.setTag(TAG);
+            Fn.addToRequestQue(requestQueue, imageRequest, getActivity()
+            );
+        }
     }
     @Override
     public void onResume() {

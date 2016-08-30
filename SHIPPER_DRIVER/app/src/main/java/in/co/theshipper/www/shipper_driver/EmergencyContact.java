@@ -55,7 +55,9 @@ public class EmergencyContact extends Fragment {
     public void onCreate( Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        controller = new DBController(getActivity());
+        if(getActivity() != null) {
+            controller = new DBController(getActivity());
+        }
 
     }
 
@@ -83,18 +85,20 @@ public class EmergencyContact extends Fragment {
     }
     protected void uiupdate()
     {
-        SQLiteDatabase sqlDB = controller.getWritableDatabase();
-        Cursor cursor = sqlDB.rawQuery("SELECT * FROM contactsdb",null);
-        listAdapter = new SimpleCursorAdapter(
-                getActivity(),
-                R.layout.phone_name_view,
-                cursor,
-                new String[]{"name","number"},
-                new int[]{R.id.name,R.id.number},
-                0
-        );
-        //ListView=(ListView)this.getActivity().findViewById(R.id.list);
-        listView.setAdapter(listAdapter);
+        if(getActivity() != null) {
+            SQLiteDatabase sqlDB = controller.getWritableDatabase();
+            Cursor cursor = sqlDB.rawQuery("SELECT * FROM contactsdb", null);
+            listAdapter = new SimpleCursorAdapter(
+                    getActivity(),
+                    R.layout.phone_name_view,
+                    cursor,
+                    new String[]{"name", "number"},
+                    new int[]{R.id.name, R.id.number},
+                    0
+            );
+            //ListView=(ListView)this.getActivity().findViewById(R.id.list);
+            listView.setAdapter(listAdapter);
+        }
     }
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     @Override
@@ -116,20 +120,7 @@ public class EmergencyContact extends Fragment {
                 startActivity(callIntent);
             }
         });
-//        v= (Button) getActivity().findViewById(R.id.callButton);
-//        v.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                View call = (View) v.getParent();
-//                TextView number = (TextView) call.findViewById(R.id.number);
-//                String PhoneNum = number.getText().toString();
-//                Intent callIntent = new Intent(Intent.ACTION_DIAL);
-//                callIntent.setData(Uri.parse("tel:"+Uri.encode(PhoneNum.trim())));
-//                callIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-//                startActivity(callIntent);
-//            }
-//        });
-        //v.setOnClickListener(onClick);
+
         listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE_MODAL);
         listView.setMultiChoiceModeListener(new AbsListView.MultiChoiceModeListener() {
 
@@ -139,9 +130,6 @@ public class EmergencyContact extends Fragment {
 
                 // Prints the count of selected Items in title
                 mode.setTitle(listView.getCheckedItemCount() + " Selected");
-
-                // Toggle the state of item after every click on it
-                // mAdapter.toggleSelection(position);
             }
 
             /**
@@ -227,103 +215,106 @@ public class EmergencyContact extends Fragment {
 
     }
     protected void Contact() {
-        Intent intent = new Intent(Intent.ACTION_PICK, Uri.parse(Phone.NUMBER));
-        intent.setType(Contacts.CONTENT_TYPE);
-        if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
-            startActivityForResult(intent, REQUEST_SELECT_CONTACT);
+        if(getActivity() != null) {
+            Intent intent = new Intent(Intent.ACTION_PICK, Uri.parse(Phone.NUMBER));
+            intent.setType(Contacts.CONTENT_TYPE);
+            if (intent.resolveActivity(getActivity().getPackageManager()) != null) {
+                startActivityForResult(intent, REQUEST_SELECT_CONTACT);
+            }
         }
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if (resultCode == RESULT_OK) {
-            switch (requestCode) {
-                case REQUEST_SELECT_CONTACT:
-                    Cursor cursor = null;
-                    String phoneNumber= "";
-                    List<String> allNumbers = new ArrayList<String>();
-                    int phoneIdx = 0;
-                    int phhoneNx=0;
-                     //String selectedNum = "";
-                    try {
-                        Uri result = data.getData();
-                        String id = result.getLastPathSegment();
-                        cursor = getActivity().getContentResolver().query(Phone.CONTENT_URI, null, Phone.CONTACT_ID + "=?", new String[] { id }, null);
-                        phoneIdx = cursor.getColumnIndex(Phone.NUMBER);
-                        phhoneNx = cursor.getColumnIndex(Phone.DISPLAY_NAME);
-                        if (cursor.moveToFirst()) {
-                            while (cursor.isAfterLast() == false) {
-                                phoneNumber = cursor.getString(phoneIdx);
-                                phoneName = cursor.getString(phhoneNx);
-                                Fn.logD("phoneNumber",phoneNumber);
-                                Fn.logD("phoneName",phoneName);
-                                allNumbers.add(phoneNumber);
-                                cursor.moveToNext();}
-                        } else {
-                            //no results actions
-                        }
-                    } catch (Exception e) {
-                        //error actions
-                    } finally {
-                        if (cursor != null) {
-                            cursor.close();
-                        }
-                        final CharSequence[] items =(allNumbers.toArray(new String[allNumbers.size()]));
-                        if(allNumbers.size() > 1) {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-                        builder.setTitle("Choose a number");
-                        builder.setItems(items, new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int item) {
-                                String selectedNumber = items[item].toString();
-                                selectedNumber = selectedNumber.replace("-", "");
-                                selectedNum = selectedNumber;
-                                Fn.logD("number ",selectedNum);
+        if(getActivity() != null) {
+            if (resultCode == RESULT_OK) {
+                switch (requestCode) {
+                    case REQUEST_SELECT_CONTACT:
+                        Cursor cursor = null;
+                        String phoneNumber = "";
+                        List<String> allNumbers = new ArrayList<String>();
+                        int phoneIdx = 0;
+                        int phhoneNx = 0;
+                        //String selectedNum = "";
+                        try {
+                            Uri result = data.getData();
+                            String id = result.getLastPathSegment();
+                            cursor = getActivity().getContentResolver().query(Phone.CONTENT_URI, null, Phone.CONTACT_ID + "=?", new String[]{id}, null);
+                            phoneIdx = cursor.getColumnIndex(Phone.NUMBER);
+                            phhoneNx = cursor.getColumnIndex(Phone.DISPLAY_NAME);
+                            if (cursor.moveToFirst()) {
+                                while (cursor.isAfterLast() == false) {
+                                    phoneNumber = cursor.getString(phoneIdx);
+                                    phoneName = cursor.getString(phhoneNx);
+                                    Fn.logD("phoneNumber", phoneNumber);
+                                    Fn.logD("phoneName", phoneName);
+                                    allNumbers.add(phoneNumber);
+                                    cursor.moveToNext();
+                                }
+                            } else {
+                                //no results actions
+                            }
+                        } catch (Exception e) {
+                            //error actions
+                        } finally {
+                            if (cursor != null) {
+                                cursor.close();
+                            }
+                            final CharSequence[] items = (allNumbers.toArray(new String[allNumbers.size()]));
+                            if (allNumbers.size() > 1) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+                                builder.setTitle("Choose a number");
+                                builder.setItems(items, new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int item) {
+                                        String selectedNumber = items[item].toString();
+                                        selectedNumber = selectedNumber.replace("-", "");
+                                        selectedNum = selectedNumber;
+                                        Fn.logD("number ", selectedNum);
+                                        Fn.logD("name ", phoneName);
+                                        if (!selectedNum.equals("")) {
+                                            HashMap<String, String> queryValues = new HashMap<String, String>();
+                                            queryValues.put("name", phoneName);
+                                            queryValues.put("number", selectedNum);
+                                            controller.insert(queryValues, 4);
+                                            uiupdate();
+                                        } else {
+                                            Toast.makeText(getContext(), "Enter a valid number", Toast.LENGTH_SHORT).show();
+                                        }
+
+                                    }
+                                });
+                                AlertDialog alert = builder.create();
+                                alert.show();
+                            } else {
+                                selectedNum = phoneNumber.toString();
+                                selectedNum = selectedNum.replace("-", "");
+                                Fn.logD("number ", selectedNum);
                                 Fn.logD("name ", phoneName);
-                                if(!selectedNum.equals("")){
-                                HashMap<String, String> queryValues=new HashMap<String, String>();
-                                queryValues.put("name", phoneName);
-                                queryValues.put("number", selectedNum);
-                                controller.insert(queryValues, 4);
-                                uiupdate();}
-                                else
-                                {
+                                if (!selectedNum.equals("")) {
+                                    HashMap<String, String> queryValues = new HashMap<String, String>();
+                                    queryValues.put("name", phoneName);
+                                    queryValues.put("number", selectedNum);
+                                    controller.insert(queryValues, 4);
+                                    uiupdate();
+                                } else {
                                     Toast.makeText(getContext(), "Enter a valid number", Toast.LENGTH_SHORT).show();
                                 }
-
                             }
-                        });
-                        AlertDialog alert = builder.create();
-                            alert.show();
-                        } else {
-                             selectedNum = phoneNumber.toString();
-                            selectedNum = selectedNum.replace("-", "");
-                            Fn.logD("number ",selectedNum);
-                            Fn.logD("name ", phoneName);
-                            if(!selectedNum.equals("")){
-                            HashMap<String, String> queryValues=new HashMap<String, String>();
-                            queryValues.put("name",phoneName);
-                            queryValues.put("number",selectedNum);
-                            controller.insert(queryValues,4);
-                            uiupdate();}
-                            else
-                            {
-                                Toast.makeText(getContext(), "Enter a valid number", Toast.LENGTH_SHORT).show();
+
+                            try {
+                                controller.getAll();
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            if (phoneNumber.length() == 0) {
+                                //no numbers found actions
                             }
                         }
+                        break;
+                }
+            } else {
 
-                        try {
-                            controller.getAll();
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        }
-                        if (phoneNumber.length() == 0) {
-                            //no numbers found actions
-                        }
-                    }
-                    break;
             }
-        } else {
-
         }
     }
     private void onCallButtonClick(View v) {

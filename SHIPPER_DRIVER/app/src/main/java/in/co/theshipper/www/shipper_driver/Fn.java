@@ -271,6 +271,12 @@ public class Fn {
         String strDate = df.format(date);
         return strDate;
     }
+    protected static long getDateTimeNowMillis() {
+        TimeZone tz = TimeZone.getTimeZone("GMT+05:30");
+        Calendar c = Calendar.getInstance(tz);
+        long TimeNowMillis = c.getTimeInMillis();
+        return TimeNowMillis;
+    }
     protected static String getDate(long dateInMillis) {
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         String dateString = formatter.format(new Date(dateInMillis));

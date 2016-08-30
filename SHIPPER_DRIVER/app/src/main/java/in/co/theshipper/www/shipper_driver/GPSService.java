@@ -65,11 +65,14 @@ public class GPSService extends Service implements GoogleApiClient.ConnectionCal
     private Boolean responseReceived = true;
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     private Notification notification;
+    private long start_time = 0;
 
     @Override
     public void onCreate() {
-        calendar1 = Calendar.getInstance();
-        time1 = calendar1.getTimeInMillis();
+
+        if(getApplicationContext() != null){
+            start_time = Long.parseLong(Fn.getPreference(getApplicationContext(),Constants.Keys.LOADING_START_TIME));
+        }
         Fn.SystemPrintLn("entered on create service");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addConnectionCallbacks(this)
@@ -119,16 +122,22 @@ public class GPSService extends Service implements GoogleApiClient.ConnectionCal
             mGoogleApiClient.disconnect();
         }
         Fn.SystemPrintLn("diffHours:" + diffHours + "diffmin :" + diffmin + "diffsec:" + diffsec + "totDist:" + totDist);
-        Intent i = new Intent(this, FullActivity.class);
-        i.putExtra("menuFragment", "BillDetails");
-        i.putExtra("crn_no", crn_no);
-        i.putExtra("seconds", diffsec);
-        i.putExtra("minutes", diffmin);
-        i.putExtra("hours", diffHours);
-        i.putExtra("distance", totDist);
-        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-        startActivity(Fn.CheckIntent(i));
+        do {
+            if (getApplicationContext() != null) {
+                Fn.putPreference(getApplicationContext(), Constants.Keys.CRN_NO, crn_no);
+                Fn.putPreference(getApplicationContext(), Constants.Keys.TOTAL_DISTANCE_TAVELLED, String.valueOf(totDist));
+            }
+        }while(getApplicationContext() == null);
+//        Intent i = new Intent(this, FullActivity.class);
+//        i.putExtra("menuFragment", "BillDetails");
+//        i.putExtra("crn_no", crn_no);
+//        i.putExtra("seconds", diffsec);
+//        i.putExtra("minutes", diffmin);
+//        i.putExtra("hours", diffHours);
+//        i.putExtra("distance", totDist);
+//        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+//        i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+//        startActivity(Fn.CheckIntent(i));
 //             Fn.SystemPrintLn("onDestroy entered");
     }
 
@@ -186,7 +195,6 @@ public class GPSService extends Service implements GoogleApiClient.ConnectionCal
                             // DistanceRecieveSuccess(response);
                             responseReceived = true;
 //                            LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, (LocationListener) this);
-
                             try {
                                 jsonObject = new JSONObject(response);
                                 rows = jsonObject.getJSONArray("rows");
@@ -210,7 +218,7 @@ public class GPSService extends Service implements GoogleApiClient.ConnectionCal
                             totDist = totDist + distancef;
                             i++;
                             calendar2 = Calendar.getInstance();
-                            diff = (calendar2.getTimeInMillis() - time1);
+                            diff = (calendar2.getTimeInMillis() - start_time);
                             diffsec = (diff / (1000) )% 60;
                             diffmin = (diff / (60 * 1000)) % 60;
                             diffHours = diff / (60 * 60 * 1000);
@@ -220,13 +228,17 @@ public class GPSService extends Service implements GoogleApiClient.ConnectionCal
                                     "Distance Received"+String.valueOf(distancef)+System.getProperty("line.separator")+System.getProperty("line.separator")+
                                     "Total Distance"+String.valueOf(totDist)+System.getProperty("line.separator")+System.getProperty("line.separator")+
                                     String.valueOf(diffHours) + "hrs :" + String.valueOf(diffmin) + "min :" + String.valueOf(diffsec)+"sec";
-                            Fn.ToastShort(getApplicationContext(),ToastString);
+                            if(getApplicationContext() != null) {
+                                Fn.ToastShort(getApplicationContext(), ToastString);
+                            }
 
                         }
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError error) {
-                            Fn.ToastShort(getApplicationContext(),"distance mistake-Error: "+String.valueOf(error));
+                            if(getApplicationContext() != null) {
+                                Fn.ToastShort(getApplicationContext(), "distance mistake-Error: " + String.valueOf(error));
+                            }
                         }
                     });
                     volley(stringRequest);
